@@ -1,17 +1,24 @@
+import io
 import json
 from datetime import timedelta
 
+import xlsxwriter
+from django import forms
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.db.models import Sum, F
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView
 from django.views.generic import ListView
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
 from sales.models import Sale, SaleItem
-from .forms import ProductForm
 from .models import Product
 
 
@@ -76,21 +83,83 @@ def admin_panel(request):
     }
     return render(request, "users/admin-panel.html", context)
 
-class ProductCreateView(CreateView):
-    model = Product
-    form_class = ProductForm
-    template_name = "inventory/product_form.html"
-    success_url = reverse_lazy("product_list")
 
 
-class ProductUpdateView(UpdateView):
-    model = Product
-    form_class = ProductForm
-    template_name = "inventory/product_form.html"
-    success_url = reverse_lazy("product_list")
+# views.py
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth import get_user_model
+from inventory.forms import UserForm
+
+User = get_user_model()
 
 
-class ProductDeleteView(DeleteView):
-    model = Product
-    template_name = "inventory/product_confirm_delete.html"
-    success_url = reverse_lazy("product_list")
+class UserCreateView(UserPassesTestMixin, CreateView):
+    model = User
+    form_class = UserForm
+    template_name = "users/user-form.html"
+    success_url = reverse_lazy("admin_panel")
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.set_password(form.cleaned_data['password'])  # passwordni hash qilish
+        user.save()
+        form.save_m2m()
+        return super().form_valid(form)
+
+
+def export_sales_excel(request):
+    if not request.user.is_superuser:
+        return HttpResponse("Ruxsat yo'q", status=403)
+
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(output)
+    worksheet = workbook.add_worksheet("Sales")
+
+    headers = ['Mijoz', 'Summasi', 'Sana']
+    for col_num, header in enumerate(headers):
+        worksheet.write(0, col_num, header)
+
+    sales = Sale.objects.select_related('customer').all().order_by('-created_at')
+    for row_num, sale in enumerate(sales, start=1):
+        worksheet.write(row_num, 0, sale.customer.name if sale.customer else "Umumiy mijoz")
+        worksheet.write(row_num, 1, sale.total_amount)
+        worksheet.write(row_num, 2, sale.created_at.strftime("%d-%m-%Y %H:%M"))
+
+    workbook.close()
+    output.seek(0)
+    response = HttpResponse(output.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response['Content-Disposition'] = 'attachment; filename=sales.xlsx'
+    return response
+
+
+# PDF export
+def export_sales_pdf(request):
+    if not request.user.is_superuser:
+        return HttpResponse("Ruxsat yo'q", status=403)
+
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    y = height - 50
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(50, y, "Oxirgi Savdo Hisoboti")
+    y -= 40
+    p.setFont("Helvetica", 12)
+    sales = Sale.objects.select_related('customer').all().order_by('-created_at')
+    for sale in sales:
+        text = f"{sale.created_at.strftime('%d-%m-%Y %H:%M')} | {sale.customer.name if sale.customer else 'Umumiy mijoz'} | {sale.total_amount} so'm"
+        p.drawString(50, y, text)
+        y -= 20
+        if y < 50:
+            p.showPage()
+            y = height - 50
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    return HttpResponse(buffer, content_type='application/pdf')
+

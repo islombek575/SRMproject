@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container p-4">
+    <h3 class="mb-4">➕ Foydalanuvchi qo‘shish</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Saqlash</button>
+        <a href="{% url 'admin_panel' %}" class="btn btn-secondary">Bekor qilish</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>📊 Maxsulotlar Dashboard</h1>
+
+{% if user.is_superuser %}
+    <p>Salom Superuser! Siz barcha mahsulotlarni ko‘rishingiz mumkin.</p>
+    <a href="{% url 'product_create' %}">➕ Yangi mahsulot qo'shish</a>
+    <ul>
+        {% for product in products %}
+            <li>
+                {{ product.name }} - {{ product.price }}$
+                <a href="{% url 'product_update' product.id %}">✏️ Tahrirlash</a>
+                <a href="{% url 'product_delete' product.id %}">🗑 O‘chirish</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Salom {{ user.username }}! Siz faqat o‘z mahsulotlaringizni ko‘rishingiz mumkin.</p>
+    <a href="{% url 'product_create' %}">➕ Yangi mahsulot qo'shish</a>
+    <ul>
+        {% for product in products %}
+            <li>
+                {{ product.name }} - {{ product.price }}$
+                <a href="{% url 'product_update' product.id %}">✏️ Tahrirlash</a>
+            </li>
+        {% empty %}
+            <li>Sizda hali mahsulot yo‘q.</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% endblock %}
