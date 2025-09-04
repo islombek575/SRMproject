@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Mahsulot qo'shish / tahrirlash</title>
+</head>
+<body>
+    <h2>🛒 Mahsulot qo'shish / tahrirlash</h2>
+
+    <!-- Form test uchun qo'lda yozilgan -->
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">💾 Saqlash</button>
+        <a href="{% url 'product_list_view' %}">⬅️ Bekor qilish</a>
+    </form>
+
+    <hr>
+    <h3>Test uchun qo‘lda yozilgan inputlar:</h3>
+    <form>
+        <label>Nom:</label>
+        <input type="text" value="Coca-Cola 1L"><br><br>
+
+        <label>Shtrix-kod:</label>
+        <input type="text" value="1234567890123"><br><br>
+
+        <label>Narx:</label>
+        <input type="number" value="12000"><br><br>
+
+        <label>Soni:</label>
+        <input type="number" value="50"><br><br>
+
+        <button>💾 Saqlash (test)</button>
+    </form>
+</body>
+</html>

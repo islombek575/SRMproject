@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8">
+            <div class="card profile-card shadow-lg border-0 rounded-4 overflow-hidden">
+                <!-- Header qismi -->
+                <div class="profile-header text-center text-white py-5"
+                     style="background: linear-gradient(135deg, #2563eb, #1e3a8a);">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=1e3a8a&color=fff&size=120"
+                         class="rounded-circle border border-3 border-light shadow" alt="User Avatar">
+                    <h3 class="mt-3 mb-0 fw-bold">{{ request.user.username }}</h3>
+                    <p class="text-light-50 mb-0">👤 Foydalanuvchi</p>
+                </div>
+
+                <!-- Body qismi -->
+                <div class="card-body p-4">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>👨‍💻 <b>Username</b></span>
+                            <span>{{ request.user.username }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>📧 <b>Email</b></span>
+                            <span>{{ request.user.email|default:"Kiritilmagan" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>🕒 <b>Oxirgi kirish</b></span>
+                            <span>{{ request.user.last_login|date:"Y-m-d H:i" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>📅 <b>A'zo bo‘lgan</b></span>
+                            <span>{{ request.user.date_joined|date:"Y-m-d H:i" }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Footer qismi -->
+                <div class="card-footer bg-light text-center py-3">
+                    <a href="{% url 'logout_page' %}" class="btn btn-danger w-100 fw-semibold shadow-sm">
+                        🚪 Chiqish
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
+    }
+    .profile-header {
+        position: relative;
+    }
+    .profile-header img {
+        transition: transform 0.3s ease;
+    }
+    .profile-header img:hover {
+        transform: scale(1.1);
+    }
+    .list-group-item {
+        border: none;
+        padding: 12px 16px;
+    }
+    .list-group-item span:last-child {
+        font-weight: 500;
+        color: #374151;
+    }
+</style>
+{% endblock %}
