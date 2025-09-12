@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}📊 Dashboard{% endblock %}
+
+{% block content %}
+<h3 class="mb-4">📊 Statistika</h3>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-2">
+    <div class="card shadow-sm text-bg-primary">
+      <div class="card-body text-center">
+        <h6>📦 Mahsulotlar</h6>
+        <h4>{{ total_products }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm text-bg-success">
+      <div class="card-body text-center">
+        <h6>💰 Ombor qiymati</h6>
+        <h4>{{ total_value|floatformat:0|intcomma }} so‘m</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm text-bg-warning">
+      <div class="card-body text-center">
+        <h6>🛒 Sotuvlar</h6>
+        <h4>{{ total_sales }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm text-bg-danger">
+      <div class="card-body text-center">
+        <h6>💵 Jami tushum</h6>
+        <h4>{{ total_revenue|floatformat:0|intcomma }} so‘m</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="card shadow-sm text-bg-info">
+      <div class="card-body text-center">
+        <h6>🔥 Bugungi tushum</h6>
+        <h4>{{ today_revenue|floatformat:0|intcomma }} so‘m</h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="my-4">
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">📈 Kunlik tushum (7 kun)</div>
+      <div class="card-body">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">🥇 Eng ko‘p sotilgan mahsulotlar</div>
+      <div class="card-body">
+        <ul class="list-group">
+          {% for item in top_products %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {{ item.items__product__name }}
+              <span class="badge bg-primary rounded-pill ms-2">{{ item.quantity_sold }}</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item">🚫 Hozircha mahsulot yo‘q</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">📊 Kategoriya bo‘yicha sotuvlar</div>
+      <div class="card-body">
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">⚠️ Tugab borayotgan mahsulotlar</div>
+      <div class="card-body">
+        <ul class="list-group">
+          {% for p in low_stock %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {{ p.name }}
+              <span class="badge bg-danger rounded-pill ms-2">{{ p.stock }}</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item">🚫 Barchasi yetarli</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: {
+      labels: {{ last7_days_labels|safe }},
+      datasets: [{
+        label: 'Tushum',
+        data: {{ last7_days_revenue|safe }},
+        borderColor: '#198754',
+        backgroundColor: 'rgba(25,135,84,0.2)',
+        fill: true,
+        tension: 0.4
+      }]
+    }
+  });
+
+  new Chart(document.getElementById('categoryChart'), {
+    type: 'doughnut',
+    data: {
+      labels: {{ category_names|safe }},
+      datasets: [{
+        data: {{ category_totals|safe }},
+        backgroundColor: ['#0d6efd','#198754','#ffc107','#dc3545','#6610f2','#fd7e14']
+      }]
+    }
+  });
+</script>
+{% endblock %}

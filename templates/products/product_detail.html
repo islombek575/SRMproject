@@ -1,10 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load widget_tweaks %}
 
-</body>
-</html>
+{% block title %}{{ form.instance.id|default:"Yangi" }} mahsulot{% endblock %}
+
+{% block content %}
+<div class="card p-4 mx-auto shadow" style="max-width:600px;">
+    <h3 class="mb-4 text-center">
+        {{ form.instance.id|default:"Yangi mahsulot qo‘shish" }}
+    </h3>
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label fw-bold">{{ field.label }}</label>
+            {{ field|add_class:"form-control" }}
+            {% if field.errors %}
+            <div class="text-danger small">{{ field.errors }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">
+                💾 Saqlash
+            </button>
+            <a href="{% url 'products:dashboard' %}" class="btn btn-secondary">
+                ❌ Bekor qilish
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

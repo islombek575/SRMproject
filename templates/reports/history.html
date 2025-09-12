@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold text-primary">📜 Savdo tarixi</h3>
+    <a href="?export=csv" class="btn btn-sm btn-outline-secondary shadow-sm">
+      🔽 CSV
+    </a>
+  </div>
+
+  <!-- Filter form -->
+  <form class="row g-2 mb-3">
+    <div class="col-md-3">
+      <input name="q" class="form-control" placeholder="🔍 Mijoz yoki Sale ID" value="{{ q }}">
+    </div>
+    <div class="col-md-2">
+      <input type="date" name="start" class="form-control" value="{{ start }}">
+    </div>
+    <div class="col-md-2">
+      <input type="date" name="end" class="form-control" value="{{ end }}">
+    </div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="">📊 Barchasi</option>
+        <option value="draft" {% if status == 'draft' %}selected{% endif %}>📝 Draft</option>
+        <option value="finished" {% if status == 'finished' %}selected{% endif %}>✅ Finished</option>
+        <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>❌ Cancelled</option>
+      </select>
+    </div>
+    <div class="col-md-1">
+      <button class="btn btn-primary w-100 shadow-sm">Filtr</button>
+    </div>
+  </form>
+
+  <!-- Table -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Sana</th>
+            <th>ID</th>
+            <th>To'lov</th>
+            <th>Sotuvchi</th>
+            <th>💰 Jami</th>
+            <th>💵 To'langan</th>
+            <th>Status</th>
+            <th>📦 Mahsulotlar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sales %}
+          <tr>
+            <td class="text-muted">{{ forloop.counter0|add:sales.start_index }}</td>
+            <td>{{ s.created_at|date:"Y-m-d H:i" }}</td>
+            <td><span class="badge bg-secondary">{{ s.id|slice:":8" }}</span></td>
+            <td>{{ s.payment_type|default:"-" }}</td>
+            <td>{{ s.seller.username|default:"-" }}</td>
+            <td class="fw-bold text-success">{{ s.total_amount|floatformat:2|intcomma }}</td>
+            <td class="fw-bold text-primary">{{ s.paid_amount|floatformat:2|intcomma }}</td>
+            <td>
+              {% if s.status == "finished" %}
+                <span class="badge bg-success">✅ {{ s.get_status_display }}</span>
+              {% elif s.status == "draft" %}
+                <span class="badge bg-warning text-dark">📝 {{ s.get_status_display }}</span>
+              {% elif s.status == "cancelled" %}
+                <span class="badge bg-danger">❌ {{ s.get_status_display }}</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ s.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% for it in s.items.all %}
+                <div class="small text-muted">{{ it.product.name }} <span class="badge bg-light text-dark">x{{ it.quantity }}</span></div>
+              {% endfor %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="text-center py-4 text-muted">
+              🚫 Savdo topilmadi
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <nav class="mt-3">
+    <ul class="pagination justify-content-center">
+      {% if sales.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ sales.previous_page_number }}">«</a>
+        </li>
+      {% endif %}
+      <li class="page-item disabled">
+        <span class="page-link">Sahifa {{ sales.number }} / {{ sales.paginator.num_pages }}</span>
+      </li>
+      {% if sales.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ sales.next_page_number }}">»</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endblock %}

@@ -2,7 +2,6 @@
 import os
 from pathlib import Path
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,6 +32,10 @@ INSTALLED_APPS = [
     'sales',
     'customers',
     'users',
+    'products',
+    'widget_tweaks',
+    "django.contrib.humanize",
+    'credits',
 ]
 
 MIDDLEWARE = [
@@ -131,9 +134,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
 
-LOGIN_URL = 'user_login'
-LOGIN_REDIRECT_URL = 'dashboard_view'
-LOGOUT_REDIRECT_URL = 'user_login'
+LOGIN_URL = 'users:user_login'
+LOGIN_REDIRECT_URL = 'inventory:dashboard_view'
+LOGOUT_REDIRECT_URL = 'users:user_login'
 
 
 

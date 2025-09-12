@@ -1,33 +1,117 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
+<h2 class="mb-4">📊 Dashboard</h2>
 
-<h1>📊 Maxsulotlar Dashboard</h1>
+<!-- Dashboard cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 text-center bg-primary text-white">
+            <h5>Mahsulotlar soni</h5>
+            <h2>{{ total_products }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 text-center bg-success text-white">
+            <h5>Umumiy summa</h5>
+            <h2>{{ total_value|floatformat:0|intcomma }}  so'm</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 text-center bg-warning text-dark">
+            <h5>Bugungi savdo</h5>
+            <h2>{{ today_sales|floatformat:0|intcomma }}  so'm</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 text-center bg-info text-white">
+            <h5>Kategoriyalar soni</h5>
+            <h2>{{ total_categories }}</h2>
+        </div>
+    </div>
+</div>
 
-{% if user.is_superuser %}
-    <p>Salom Superuser! Siz barcha mahsulotlarni ko‘rishingiz mumkin.</p>
-    <a href="{% url 'product_create' %}">➕ Yangi mahsulot qo'shish</a>
-    <ul>
-        {% for product in products %}
-            <li>
-                {{ product.name }} - {{ product.price }}$
-                <a href="{% url 'product_update' product.id %}">✏️ Tahrirlash</a>
-                <a href="{% url 'product_delete' product.id %}">🗑 O‘chirish</a>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>Salom {{ user.username }}! Siz faqat o‘z mahsulotlaringizni ko‘rishingiz mumkin.</p>
-    <a href="{% url 'product_create' %}">➕ Yangi mahsulot qo'shish</a>
-    <ul>
-        {% for product in products %}
-            <li>
-                {{ product.name }} - {{ product.price }}$
-                <a href="{% url 'product_update' product.id %}">✏️ Tahrirlash</a>
-            </li>
-        {% empty %}
-            <li>Sizda hali mahsulot yo‘q.</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+<div class="card p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>So‘nggi mahsulotlar</h4>
+        {% if request.user.is_superuser %}
+        <div class="d-flex gap-2">
+            <a href="{% url 'products:product_create' %}" class="btn btn-success btn-sm">
+                🆕 Add New Product
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <table class="table table-hover mt-3">
+        <!-- table content -->
+    </table>
+</div>
+
+
+
+    <table class="table table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>BarCode</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Category</th>
+                {% if request.user.is_superuser %}
+                <th>Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.barcode }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.price }}  so'm</td>
+                <td>{{ product.category.name }}</td>
+                <td>
+            {% if request.user.is_superuser %}
+            <a href="{% url 'products:product_update' product.id %}"
+               class="btn btn-sm btn-warning"
+               title="Edit Product">
+               🔄
+            </a>
+
+            <a href="{% url 'products:product_delete' product.id %}"
+               class="btn btn-sm btn-danger"
+               title="Delete Product">
+               🗑
+            </a>
+            {% endif %}
+            <style>
+            .btn i {
+                transition: transform 0.2s;
+            }
+
+            .btn:hover i {
+                transform: scale(1.2);
+            }
+            </style>
+
+            <script>
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+              return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+            </script>
+
+
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">Hech qanday mahsulot yo‘q</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

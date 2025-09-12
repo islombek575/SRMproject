@@ -16,7 +16,7 @@ class SaleItemInline(admin.TabularInline):
 
 @admin.register(Sale)
 class SaleAdmin(admin.ModelAdmin):
-    list_display = ("id", "customer", "total_amount", "created_at")
+    list_display = ("id", "customer", "seller","total_amount", "created_at")
     list_filter = ("created_at",)
     search_fields = ("customer__name",)
     date_hierarchy = "created_at"
@@ -25,8 +25,8 @@ class SaleAdmin(admin.ModelAdmin):
 
 @admin.register(SaleItem)
 class SaleItemAdmin(admin.ModelAdmin):
-    list_display = ("id", "sale", "product_name", "quantity", "price", "subtotal")
-    search_fields = ("product_name",)
+    list_display = ["id", "sale", "product", "quantity", "price", "subtotal"]
+    search_fields = ("price",)
     list_filter = ("sale__created_at",)
 
 

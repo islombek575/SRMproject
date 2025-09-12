@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>🛒 Savdoni yakunlash</h2>
+
+    <p>Jami summa: {{ total }}</p>
+
+    <!-- Tugma modalni ochadi -->
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#finishModal">
+        ✅ Savdoni yakunlash
+    </button>
+</div>
+
+    <div class="modal fade" id="finishModal" tabindex="-1" aria-labelledby="finishModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="finishModalLabel">Savdoni yakunlash</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label>Jami summa:</label>
+                    <input type="text" class="form-control" value="{{ total }}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label>Qancha to‘landi:</label>
+                    <input type="number" name="paid_amount" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>To‘lov turi:</label>
+                    <select name="payment_type" id="payment_type" class="form-control" required onchange="toggleCustomer()">
+                        <option value="cash">Naqd</option>
+                        <option value="card">Carta</option>
+                        <option value="credit">Nasiya</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="customerDiv" style="display:none;">
+                    <label>Mijoz ismi:</label>
+                    <input type="text" name="customer_name" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label>Qaytim:</label>
+                    <input type="text" id="change" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" name="finish_sale" class="btn btn-success w-100">Yakunlash</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleCustomer(){
+    const paymentType = document.getElementById('payment_type').value;
+    const customerDiv = document.getElementById('customerDiv');
+    customerDiv.style.display = paymentType === 'credit' ? 'block' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const paidInput = document.querySelector('[name="paid_amount"]');
+    const changeInput = document.getElementById('change');
+    const total = parseFloat("{{ total|default:0|floatformat:2 }}");
+
+    if(paidInput) {
+        paidInput.addEventListener('input', function(){
+            const paid = parseFloat(this.value) || 0;
+            changeInput.value = (paid - total).toFixed(2);
+        });
+    }
+});
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="alert alert-danger">
+    <h4>⚠️ O‘chirishni tasdiqlash</h4>
+    <p>Haqiqatan ham <b>{{ credit.customer.name|default:"-" }}</b> nasiyasini o‘chirmoqchimisiz?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">🗑️ Ha, o‘chirish</button>
+      <a href="{% url 'credits:credit_list' %}" class="btn btn-secondary">⬅️ Yoq, qaytish</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+<div class="container mt-4">
+  <h3>💳 Nasiya ro'yxati</h3>
+
+  <form class="row g-2 mb-3">
+    <div class="col-md-4">
+      <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Mijoz ismi">
+    </div>
+    <div class="col-md-3">
+      <select name="status" class="form-control">
+        <option value="">Barchasi</option>
+        <option value="outstanding" {% if status == "outstanding" %}selected{% endif %}>Nasiya</option>
+        <option value="partial" {% if status == "partial" %}selected{% endif %}>Qisman</option>
+        <option value="paid" {% if status == "paid" %}selected{% endif %}>To‘langan</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100">🔎 Qidirish</button>
+    </div>
+  </form>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Mijoz</th>
+            <th>Jami</th>
+            <th>To‘langan</th>
+            <th>Qoldiq</th>
+            <th>Status</th>
+            <th>Sana</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in credits %}
+            <tr onclick="window.location='{% url 'credits:credit_detail' c.pk %}'" style="cursor:pointer">
+              <td>{{ forloop.counter }}</td>
+              <td>{{ c.customer.name|default:"-" }}</td>
+              <td>{{ c.amount|floatformat:2|intcomma }}</td>
+              <td>{{ c.paid_amount|floatformat:2|intcomma }}</td>
+              <td>{{ c.outstanding_amount|floatformat:2|intcomma }}</td>
+              <td>
+                {% if c.status == "outstanding" %}
+                  <span class="badge bg-danger">Nasiya</span>
+                {% elif c.status == "partial" %}
+                  <span class="badge bg-warning text-dark">Qisman</span>
+                {% else %}
+                  <span class="badge bg-success">To‘langan</span>
+                {% endif %}
+              </td>
+              <td>{{ c.created_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="text-center">🚫 Nasiya topilmadi</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

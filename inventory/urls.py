@@ -5,6 +5,8 @@ from .views import (
     DashboardView, admin_panel, UserCreateView, export_sales_excel, export_sales_pdf
 )
 
+app_name = "inventory"
+
 urlpatterns = [
     path('', login_required(DashboardView.as_view(), login_url='user_login'), name="dashboard_view"),
     path('admin-panel/', admin_panel, name='admin_panel'),

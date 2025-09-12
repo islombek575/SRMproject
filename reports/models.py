@@ -11,6 +11,7 @@ class Report(Model):
     date = DateField(default=timezone.now)
     total_sales = DecimalField(max_digits=12, decimal_places=2, default=0)
     total_transactions = PositiveIntegerField(default=0)
+    
 
     def __str__(self):
         return f"Report {self.date}"

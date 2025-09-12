@@ -8,13 +8,13 @@
         <a href="#" class="btn btn-primary shadow-sm">
             ➕ Mahsulot qo‘shish
         </a>
-        <a href="{% url 'user_create_view' %}" class="btn btn-success shadow-sm">
+        <a href="{% url 'inventory:user_create_view' %}" class="btn btn-success shadow-sm">
             👤 Foydalanuvchi qo‘shish
         </a>
-        <a href="{% url 'export_sales_excel' %}" class="btn btn-warning shadow-sm text-white">
+        <a href="{% url 'inventory:export_sales_excel' %}" class="btn btn-warning shadow-sm text-white">
             📄 Hisobotni Excel-ga eksport
         </a>
-        <a href="{% url 'export_sales_pdf' %}" class="btn btn-danger shadow-sm text-white">
+        <a href="{% url 'inventory:export_sales_pdf' %}" class="btn btn-danger shadow-sm text-white">
             🖨️ Hisobotni PDF-ga eksport
         </a>
     </div>

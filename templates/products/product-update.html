@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Mahsulotni yangilash</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Saqlash</button>
+    <a href="{% url 'products:dashboard' %}" class="btn btn-secondary">Orqaga</a>
+</form>
+{% endblock %}

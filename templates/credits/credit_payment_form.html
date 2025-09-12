@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3>💰 To‘lov qo‘shish</h3>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <p><b>Mijoz:</b> {{ credit.customer.name|default:"-" }}</p>
+      <p><b>Jami:</b> {{ credit.amount }} | <b>To‘langan:</b> {{ credit.paid_amount }} | <b>Qoldiq:</b> {{ credit.outstanding_amount }}</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">💾 To‘lov qo‘shish</button>
+        <a href="{% url 'credit_list' %}" class="btn btn-secondary">⬅️ Orqaga</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

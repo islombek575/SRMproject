@@ -3,23 +3,19 @@ import json
 from datetime import timedelta
 
 import xlsxwriter
-from django import forms
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth.models import User
 from django.db.models import Sum, F
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView
 from django.views.generic import ListView
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
+from credits.models import Credit
+from products.models import Product
 from sales.models import Sale, SaleItem
-from .models import Product
 
 
 class DashboardView(LoginRequiredMixin, ListView):
@@ -27,7 +23,7 @@ class DashboardView(LoginRequiredMixin, ListView):
     template_name = "inventory/dashboard.html"
     context_object_name = "products"
     queryset = Product.objects.order_by("-created_at")
-    login_url = "user_login"
+    login_url = "users:user_login"
     redirect_field_name = 'next'
 
     def get_context_data(self, **kwargs):
@@ -42,9 +38,11 @@ class DashboardView(LoginRequiredMixin, ListView):
 
         context["total_sales"] = Sale.objects.aggregate(total=Sum("total_amount"))["total"] or 0
 
+        context["total_credits"] = Credit.objects.aggregate(total=Sum("amount"))["total"] or 0
+
         # Top 5 mahsulot
         context["top_products"] = (
-            SaleItem.objects.values(product_title=F("product_name"))
+            SaleItem.objects.values(product_title=F("product"))
             .annotate(quantity_sold=Sum("quantity"), total_sales=Sum("subtotal"))
             .order_by("-quantity_sold")[:5]
         )
@@ -106,7 +104,7 @@ class UserCreateView(UserPassesTestMixin, CreateView):
 
     def form_valid(self, form):
         user = form.save(commit=False)
-        user.set_password(form.cleaned_data['password'])  # passwordni hash qilish
+        user.set_password(form.cleaned_data['password'])
         user.save()
         form.save_m2m()
         return super().form_valid(form)

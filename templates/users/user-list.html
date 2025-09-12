@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>👥 Foydalanuvchilar</h2>
+<a href="{% url 'users:user_add' %}" class="btn btn-primary mb-3">➕ Foydalanuvchi qo‘shish</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Admin</th>
+            <th>Staff</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.is_superuser }}</td>
+            <td>{{ user.is_staff }}</td>
+            <td>
+                <a href="{% url 'users:user_update' user.id %}" class="btn btn-sm btn-warning">✏️ Yangilash</a>
+                <a href="{% url 'users:user_delete' user.id %}" class="btn btn-sm btn-danger"
+                   onclick="return confirm('Haqiqatan ham o‘chirmoqchimisiz?')">🗑️ O‘chirish</a>
+
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,64 @@
+<!-- templates/products/add_product.html -->
+<form method="post" id="product-form">
+    {% csrf_token %}
+
+    <label>Product:</label>
+    <select id="product-select" required>
+        <option value="">Select a product</option>
+        {% for product in products %}
+        <option value="{{ product.id }}">{{ product.name }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Barcode:</label>
+    <input type="text" id="barcode" readonly><br><br>
+
+    <label>Unit:</label>
+    <input type="text" id="unit" readonly><br><br>
+
+    <label>Price:</label>
+    <input type="text" id="price" readonly><br><br>
+
+    <label>Category:</label>
+    <input type="text" id="category" readonly><br><br>
+
+    <label>Quantity:</label>
+    <input type="number" name="quantity" id="quantity" min="1" required><br><br>
+
+    <input type="hidden" name="product_id" id="product_id">
+
+    <button type="submit">Add Sale</button>
+</form>
+
+<script>
+const productSelect = document.getElementById('product-select');
+const barcodeInput = document.getElementById('barcode');
+const unitInput = document.getElementById('unit');
+const priceInput = document.getElementById('price');
+const categoryInput = document.getElementById('category');
+const productIdInput = document.getElementById('product_id');
+
+productSelect.addEventListener('change', function() {
+    const productId = this.value;
+    if(!productId){
+        barcodeInput.value = '';
+        unitInput.value = '';
+        priceInput.value = '';
+        categoryInput.value = '';
+        productIdInput.value = '';
+        return;
+    }
+
+    fetch(`/products/get-product-info/?product_id=${productId}`)
+        .then(response => response.json())
+        .then(data => {
+            if(!data.error){
+                barcodeInput.value = data.barcode;
+                unitInput.value = data.unit;
+                priceInput.value = data.price;
+                categoryInput.value = data.category;
+                productIdInput.value = data.product_id;
+            }
+        });
+});
+</script>

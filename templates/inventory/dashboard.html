@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
@@ -10,25 +11,27 @@
         <div class="col-md-6 col-lg-3">
             <div class="card text-white shadow-sm border-0 p-3" style="background: linear-gradient(135deg,#0d6efd,#0dcaf0);">
                 <h6>💰 Bugungi savdo</h6>
-                <h3>{{ today_sales }} so'm</h3>
+                <h3>{{ today_sales|floatformat:0|intcomma }} so'm</h3>
             </div>
         </div>
         <div class="col-md-6 col-lg-3">
             <div class="card text-white shadow-sm border-0 p-3" style="background: linear-gradient(135deg,#198754,#20c997);">
                 <h6>📅 Umumiy savdo</h6>
-                <h3>{{ total_sales }} so'm</h3>
+                <h3>{{ total_sales|floatformat:0|intcomma }} so'm</h3>
             </div>
         </div>
+        {% if is_superuser %}
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-white shadow-sm border-0 p-3" style="background: linear-gradient(135deg,#dc3545,#ff4d6d);">
+                <h6>📑 Umumiy Nasiyalar </h6>
+                <h3>{{ total_credits|floatformat:0|intcomma }}</h3>
+            </div>
+        </div>
+        {% endif %}
         <div class="col-md-6 col-lg-3">
             <div class="card text-white shadow-sm border-0 p-3" style="background: linear-gradient(135deg,#ffc107,#fd7e14);">
                 <h6>🔥 Top mahsulotlar</h6>
                 <h3>{{ top_products|length }}</h3>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card text-white shadow-sm border-0 p-3" style="background: linear-gradient(135deg,#dc3545,#ff4d6d);">
-                <h6>🕒 So‘nggi tranzaksiyalar</h6>
-                <h3>{{ recent_sales|length }}</h3>
             </div>
         </div>
     </div>
@@ -51,7 +54,7 @@
                         <tr>
                             <td>{{ product.product_title }}</td>
                             <td><span class="badge bg-primary">{{ product.quantity_sold }}</span></td>
-                            <td class="fw-bold text-success">{{ product.total_sales }} so'm</td>
+                            <td class="fw-bold text-success">{{ product.total_sales|floatformat:0|intcomma }} so'm</td>
                         </tr>
                         {% empty %}
                         <tr><td colspan="3" class="text-center text-muted">Ma’lumot yo‘q</td></tr>
@@ -72,7 +75,7 @@
                         {% for sale in recent_sales %}
                         <tr>
                             <td>{% if sale.customer %}{{ sale.customer.name }}{% else %}Umumiy mijoz{% endif %}</td>
-                            <td class="fw-bold text-danger">{{ sale.total_amount }} so'm</td>
+                            <td class="fw-bold text-danger">{{ sale.total_amount|floatformat:0|intcomma }} so'm</td>
                             <td>{{ sale.created_at|date:"d-m-Y H:i" }}</td>
                         </tr>
                         {% empty %}
