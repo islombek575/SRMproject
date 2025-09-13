@@ -1,15 +1,14 @@
 from django.urls import path
+from .views import UserLoginView, UserLogoutView
+from django.conf.urls.static import static
 
-from .views import UserProfileTemplateView, user_login, user_logout, user_list, user_add, user_update, user_delete
+from root.settings import MEDIA_URL, MEDIA_ROOT, STATIC_URL, STATIC_ROOT
+
 
 app_name = "users"
 
 urlpatterns = [
-    path('login/', user_login, name='user_login'),
-    path('profile/', UserProfileTemplateView.as_view(), name='user_profile'),
-    path('logout/', user_logout, name='logout_page'),
-    path('', user_list, name='user_list'),
-    path('add/', user_add, name='user_add'),
-    path('update/<int:user_id>/', user_update, name='user_update'),
-    path('delete/<int:user_id>/', user_delete, name='user_delete'),
-]
+    path("login/", UserLoginView.as_view(), name="login"),
+    path("logout/", UserLogoutView.as_view(), name="logout"),
+]+ static(MEDIA_URL, document_root=MEDIA_ROOT) + static(STATIC_URL, document_root=STATIC_ROOT)
+

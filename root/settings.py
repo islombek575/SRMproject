@@ -46,7 +46,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "root.core.middlewere.LoginRequiredMiddleware",
 
 ]
 
@@ -63,7 +62,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'inventory.context_processors.user_roles',
             ],
         },
     },
@@ -134,9 +132,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
 
-LOGIN_URL = 'users:user_login'
-LOGIN_REDIRECT_URL = 'inventory:dashboard_view'
-LOGOUT_REDIRECT_URL = 'users:user_login'
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'users:login'
+LOGOUT_REDIRECT_URL = 'users:login'
 
 
 
