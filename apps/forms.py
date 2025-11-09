@@ -1,5 +1,8 @@
+from apps.models import PurchaseItem, Sale
+from apps.models.products import Product
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 
 User = get_user_model()
 
@@ -7,7 +10,8 @@ User = get_user_model()
 class DebtPaymentForm(forms.Form):
     amount = forms.DecimalField(max_digits=12, decimal_places=2, min_value=0.01, label="To'lov summasi",
                                 widget=forms.NumberInput(attrs={
-                                    'class': 'border-2 border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                    'class': 'border-2 border-gray-300 rounded-lg px-3 py-2 w-full '
+                                             'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                                 })
                                 )
 
@@ -27,10 +31,6 @@ class EmployeeForm(forms.ModelForm):
         return user
 
 
-from django import forms
-from apps.models.products import Product
-
-
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
@@ -41,15 +41,11 @@ class ProductForm(forms.ModelForm):
             'cost_price': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded'}),
             'sell_price': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded'}),
             'unit': forms.Select(
-                choices=Product.UNIT_CHOICES,
+                choices=Product.UnitChoices,
                 attrs={'class': 'w-full p-2 border rounded'}
             ),
             'stock': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded'}),
         }
-
-
-from django import forms
-from apps.models import PurchaseItem
 
 
 class PurchaseForm(forms.ModelForm):
@@ -74,18 +70,12 @@ class PurchaseForm(forms.ModelForm):
         return cleaned_data
 
 
-from django import forms
-
-from apps.models import Sale, Product
-
-
 class SaleForm(forms.ModelForm):
     class Meta:
         model = Sale
         fields = ["payment_type", "customer"]
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         self.fields["customer"].required = False
 
@@ -93,13 +83,6 @@ class SaleForm(forms.ModelForm):
 class SaleItemForm(forms.Form):
     product = forms.ModelChoiceField(queryset=Product.objects.all(), label="Mahsulot")
     quantity = forms.IntegerField(min_value=1, label="Miqdor")
-
-
-from django import forms
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
 
 
 class LoginForm(AuthenticationForm):
@@ -117,26 +100,25 @@ class LoginForm(AuthenticationForm):
     )
 
 
-from django import forms
-from django.contrib.auth.forms import PasswordChangeForm
-
-
 class CustomPasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
         label="Eski parol",
         widget=forms.PasswordInput(attrs={
-            "class": "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+            "class": "w-full px-4 py-2 border border-gray-300 rounded-lg "
+                     "focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
         })
     )
     new_password1 = forms.CharField(
         label="Yangi parol",
         widget=forms.PasswordInput(attrs={
-            "class": "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+            "class": "w-full px-4 py-2 border border-gray-300 rounded-lg "
+                     "focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
         })
     )
     new_password2 = forms.CharField(
         label="Yangi parol (takror)",
         widget=forms.PasswordInput(attrs={
-            "class": "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+            "class": "w-full px-4 py-2 border border-gray-300 rounded-lg"
+                     " focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
         })
     )

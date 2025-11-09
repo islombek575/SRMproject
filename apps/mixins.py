@@ -1,5 +1,6 @@
 from django.core.exceptions import PermissionDenied
 
+
 class RoleRequiredMixin:
     allowed_roles = []
 

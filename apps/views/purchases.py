@@ -1,40 +1,48 @@
+from apps.mixins import RoleRequiredMixin
+from apps.models import Product, Purchase, PurchaseItem
 from django.contrib import messages
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.views import View
+from django.views.generic import DetailView, ListView
 from weasyprint import HTML
 
-from apps.mixins import RoleRequiredMixin
-from apps.models import Purchase, PurchaseItem, Product
 
-
-class PurchaseListView(RoleRequiredMixin, View):
+class PurchaseListView(RoleRequiredMixin, ListView):
     allowed_roles = ['admin']
+    model = Purchase
+    template_name = 'purchases/purchase_list.html'
+    context_object_name = 'purchases'
+    paginate_by = 20
 
-    def get(self, request):
-        selected_date = request.GET.get('date')
-        purchases = Purchase.objects.all().order_by('-purchased_at')
+    def get_queryset(self):
+        selected_date = self.request.GET.get('date')
+        queryset = super().get_queryset().order_by('-purchased_at')
 
         if selected_date:
-            purchases = purchases.filter(purchased_at__date=selected_date)
+            queryset = queryset.filter(purchased_at__date=selected_date)
 
-        total_sales = purchases.aggregate(total=Sum('total_price'))['total'] or 0
+        return queryset
 
-        return render(request, 'purchases/purchase_list.html', {
-            'purchases': purchases,
-            'total_sales': total_sales,
-            'selected_date': selected_date,
-        })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        queryset = self.get_queryset()
+        total_sales = queryset.aggregate(total=Sum('total_price'))['total'] or 0
+
+        context['total_sales'] = total_sales
+        context['selected_date'] = self.request.GET.get('date')
+        return context
 
 
-class PurchaseDetailView(RoleRequiredMixin, View):
+class PurchaseDetailView(RoleRequiredMixin, DetailView):
     allowed_roles = ['admin']
-
-    def get(self, request, pk):
-        purchase = get_object_or_404(Purchase, id=pk)
-        return render(request, 'purchases/purchase_detail.html', {'purchase': purchase})
+    model = Purchase
+    template_name = 'purchases/purchase_detail.html'
+    context_object_name = 'purchase'
+    pk_url_kwarg = 'pk'
 
 
 class AddPurchaseView(RoleRequiredMixin, View):
@@ -45,7 +53,6 @@ class AddPurchaseView(RoleRequiredMixin, View):
         return render(request, 'purchases/add_purchase.html', {'products': products})
 
     def post(self, request):
-        products = Product.objects.all()
         product_ids = request.POST.getlist('product')
         quantities = request.POST.getlist('quantity')
 
@@ -53,28 +60,35 @@ class AddPurchaseView(RoleRequiredMixin, View):
             messages.error(request, "Mahsulot tanlanmagan.")
             return redirect('add_purchase')
 
-        purchase = Purchase.objects.create(total_price=0, status="PENDING")
-        total_price = 0
+        try:
+            purchase = Purchase.objects.create(total_price=0, status="PENDING")
+            total_price = 0
 
-        for product_id, quantity in zip(product_ids, quantities):
-            product = Product.objects.get(id=product_id)
-            qty = int(quantity)
+            for product_id, quantity in zip(product_ids, quantities):
 
-            item_total = product.cost_price * qty
-            total_price += item_total
+                if product_id and int(quantity) > 0:
+                    product = get_object_or_404(Product, id=product_id)
+                    qty = int(quantity)
 
-            PurchaseItem.objects.create(
-                purchase=purchase,
-                product=product,
-                quantity=qty,
-                cost_price=product.cost_price
-            )
+                    item_total = product.cost_price * qty
+                    total_price += item_total
 
-        purchase.total_price = total_price
-        purchase.save()
+                    PurchaseItem.objects.create(
+                        purchase=purchase,
+                        product=product,
+                        quantity=qty,
+                        cost_price=product.cost_price
+                    )
 
-        messages.success(request, "Purchase qo'shildi ✅")
-        return redirect('purchase_list')
+            purchase.total_price = total_price
+            purchase.save()
+
+            messages.success(request, "Purchase qo'shildi ✅")
+            return redirect('purchase_list')
+
+        except Exception as e:
+            messages.error(request, f"Xatolik yuz berdi: {e}")
+            return redirect('add_purchase')
 
 
 class PurchasePDFView(RoleRequiredMixin, View):
@@ -83,8 +97,10 @@ class PurchasePDFView(RoleRequiredMixin, View):
     def get(self, request, pk):
         purchase = get_object_or_404(Purchase, id=pk)
         html_string = render_to_string('purchases/purchase_pdf.html', {'purchase': purchase})
+
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'filename="purchase_{purchase.id}.pdf"'
+
         HTML(string=html_string).write_pdf(response)
         return response
 

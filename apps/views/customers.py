@@ -1,13 +1,8 @@
-from django.contrib import messages
-from django.db.models import Max, F
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect, render
-from django.views import View
-from django.views.generic import ListView
-
-from apps.forms import DebtPaymentForm
 from apps.mixins import RoleRequiredMixin
-from apps.models import Customer, Debt
+from apps.models import Customer
+from django.db.models import F, Max
+from django.shortcuts import get_object_or_404
+from django.views.generic import ListView
 
 
 class CustomerListView(RoleRequiredMixin, ListView):
@@ -15,7 +10,7 @@ class CustomerListView(RoleRequiredMixin, ListView):
     model = Customer
     template_name = 'debt/customer_list.html'
     context_object_name = 'customers'
-    paginate_by = 25
+    paginate_by = 10
 
     def get_queryset(self):
         self.search_query = self.request.GET.get('q', '')
@@ -67,41 +62,3 @@ class CustomerDebtListView(RoleRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['customer'] = self.customer
         return context
-
-
-class DebtPaymentView(RoleRequiredMixin, View):
-    allowed_roles = ['admin']
-
-    def get(self, request, debt_pk, *args, **kwargs):
-        debt = get_object_or_404(Debt, pk=debt_pk)
-        if not debt.can_pay:
-            messages.error(request, "Bu qarz to‘langan, to‘lov qilolmaysiz!")
-            return redirect('customer_debt_list', customer_id=debt.customer.id)
-
-        form = DebtPaymentForm()
-        return render(request, 'debt/debt_payment.html', {'form': form, 'debt': debt})
-
-    def post(self, request, debt_pk, *args, **kwargs):
-        debt = get_object_or_404(Debt, pk=debt_pk)
-        if not debt.can_pay:
-            messages.error(request, "Bu qarz to‘langan, to‘lov qilolmaysiz!")
-            return redirect('customer_debt_list', customer_id=debt.customer.id)
-
-        form = DebtPaymentForm(request.POST)
-        if form.is_valid():
-            amount = form.cleaned_data['amount']
-            if amount > debt.remaining:
-                messages.error(
-                    request,
-                    f"To‘lov summasi qoldiq qarzdan ({debt.remaining} so‘m) katta bo‘la olmaydi!"
-                )
-            else:
-                debt.paid_amount += amount
-                debt.customer.total_debt -= amount
-                debt.status = 'paid' if debt.paid_amount >= debt.amount else 'partial'
-                debt.customer.save()
-                debt.save()
-                messages.success(request, f"{amount} so‘m muvaffaqiyatli to‘landi!")
-                return redirect('customer_debt_list', customer_id=debt.customer.id)
-
-        return render(request, 'debt/debt_payment.html', {'form': form, 'debt': debt})

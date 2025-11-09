@@ -1,5 +1,7 @@
 from functools import wraps
+
 from django.core.exceptions import PermissionDenied
+
 
 def role_required(allowed_roles=None):
     if allowed_roles is None:

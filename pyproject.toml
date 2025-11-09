@@ -7,7 +7,9 @@ dependencies = [
     "django>=5.2.6",
     "django-jazzmin>=3.0.1",
     "django-widget-tweaks>=1.5.0",
+    "flake8>=7.3.0",
     "gunicorn>=23.0.0",
+    "isort>=7.0.0",
     "openpyxl>=3.1.5",
     "pdfkit>=1.0.0",
     "pillow>=11.3.0",
@@ -16,3 +18,8 @@ dependencies = [
     "reportlab>=4.4.3",
     "weasyprint>=66.0",
 ]
+
+[tool.isort]
+profile = "hug"
+skip = "build,.tox,.venv"
+src_paths="isort,test"

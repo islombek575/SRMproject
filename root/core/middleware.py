@@ -1,5 +1,5 @@
-from django.shortcuts import redirect
 from django.conf import settings
+from django.shortcuts import redirect
 
 EXEMPT_URLS = [
     settings.LOGIN_URL,

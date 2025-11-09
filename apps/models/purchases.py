@@ -1,9 +1,16 @@
 import uuid
 
-from django.db.models import Model, UUIDField, CharField, DecimalField, ForeignKey, PositiveIntegerField, CASCADE, \
-    DateTimeField
-
 from apps.models import Product
+from django.db.models import (
+    CASCADE,
+    CharField,
+    DateTimeField,
+    DecimalField,
+    ForeignKey,
+    Model,
+    PositiveIntegerField,
+    UUIDField,
+)
 
 
 class Purchase(Model):
@@ -14,7 +21,7 @@ class Purchase(Model):
     ]
     id = UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     status = CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
-    total_price = DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    total_price = DecimalField(max_digits=12, decimal_places=2)
     purchased_at = DateTimeField(auto_now_add=True)
 
     def __str__(self):

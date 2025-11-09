@@ -1,8 +1,16 @@
 import uuid
-
-from django.db.models import Model, UUIDField, ForeignKey, CASCADE, DecimalField, CharField, DateTimeField
+from decimal import Decimal
 
 from apps.models.customers import Customer
+from django.db.models import (
+    CASCADE,
+    CharField,
+    DateTimeField,
+    DecimalField,
+    ForeignKey,
+    Model,
+    UUIDField,
+)
 
 
 class Debt(Model):
@@ -11,10 +19,10 @@ class Debt(Model):
         ('partial', "Qisman to'langan"),
         ('paid', "To'langan"),
     ]
-    id = UUIDField(default=uuid.uuid4,editable=False, unique=True, primary_key=True)
+    id = UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     customer = ForeignKey(Customer, on_delete=CASCADE, related_name='debts')
     amount = DecimalField(max_digits=12, decimal_places=2)
-    paid_amount = DecimalField(max_digits=12, decimal_places=2, default=0,null=True,blank=True)
+    paid_amount = DecimalField(max_digits=12, decimal_places=2, default=0, null=True, blank=True)
     status = CharField(max_length=10, choices=STATUS_CHOICES, default='unpaid')
     created_by = ForeignKey('apps.User', on_delete=CASCADE, related_name='debt_created_by')
     created_at = DateTimeField(auto_now_add=True)
@@ -34,7 +42,7 @@ class Debt(Model):
 
     @property
     def remaining(self):
-        return max(self.amount - self.paid_amount, 0)
+        return self.amount - self.paid_amount or Decimal(0.00)
 
     def update_status(self):
         if self.paid_amount == 0:
@@ -44,4 +52,3 @@ class Debt(Model):
         else:
             self.status = 'paid'
         self.save()
-

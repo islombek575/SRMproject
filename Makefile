@@ -7,3 +7,6 @@ run:
 
 user:
 	python3 manage.py createsuperuser
+
+loaddata:
+	python manage.py loaddata users customers debts products purchases purchaseitems sales saleitems

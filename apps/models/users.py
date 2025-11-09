@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.db.models import CharField
 
 
@@ -10,5 +9,6 @@ class User(AbstractUser):
     )
     role = CharField(max_length=20, choices=ROLE_CHOICES, default='cashier')
 
+    @property
     def is_cashier(self):
         return self.role == 'cashier'

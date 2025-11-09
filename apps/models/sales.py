@@ -1,13 +1,20 @@
 import uuid
 from decimal import Decimal
 
+from apps.models import Customer, Product
 from django.conf import settings
-from django.db.models import Model, UUIDField, ForeignKey, CharField, DecimalField, DateTimeField, PositiveIntegerField, \
-    CASCADE, SET_NULL
+from django.db.models import (
+    CASCADE,
+    SET_NULL,
+    CharField,
+    DateTimeField,
+    DecimalField,
+    ForeignKey,
+    Model,
+    PositiveIntegerField,
+    UUIDField,
+)
 from django.db.models.enums import TextChoices
-
-from apps.models import Customer
-from apps.models import Product
 
 User = settings.AUTH_USER_MODEL
 
@@ -15,7 +22,7 @@ class Sale(Model):
     class PAYMENT(TextChoices):
         CASH = 'cash', 'Naqd'
         CARD = 'card', 'Karta'
-        CREDIT = 'credit', 'Karta'
+        CREDIT = 'credit', 'Nasiya'
 
     id = UUIDField(default=uuid.uuid4, editable=False, primary_key=True, unique=True)
     customer = ForeignKey(Customer, on_delete=SET_NULL, null=True, blank=True)
@@ -34,5 +41,6 @@ class SaleItem(Model):
     quantity = PositiveIntegerField()
     price = DecimalField(max_digits=12, decimal_places=2)
 
+    @property
     def subtotal(self):
         return Decimal(self.quantity) * self.price

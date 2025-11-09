@@ -1,94 +1,97 @@
 import io
 
 import openpyxl
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.paginator import Paginator
-from django.http import FileResponse, HttpResponse
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views import View
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-
 from apps.forms import ProductForm
 from apps.mixins import RoleRequiredMixin
 from apps.models import Product
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import F, Q, Sum
+from django.http import FileResponse, HttpResponse
+from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
 
-class ProductListView(RoleRequiredMixin, View):
+class ProductListView(RoleRequiredMixin, ListView):
     allowed_roles = ['admin']
+    model = Product
+    template_name = 'products/product_list.html'
+    context_object_name = 'products'
+    paginate_by = 10
 
-    def get(self, request, *args, **kwargs):
-        query = request.GET.get('q', '')
-        category_id = request.GET.get('category', '')
+    def get_queryset(self):
 
-        products = Product.objects.order_by('-id')
-        if query:
-            products = products.filter(name__icontains=query) | products.filter(barcode__icontains=query)
-        if category_id:
-            products = products.filter(category_id=category_id)
+        self.query = self.request.GET.get('q', '')
+        self.category_id = self.request.GET.get('category', '')
 
-        paginator = Paginator(products, 10)
-        page_number = request.GET.get('page')
-        products_page = paginator.get_page(page_number)
+        queryset = super().get_queryset().order_by('-id')
 
-        total_products = Product.objects.count()
-        total_stock_value = sum(p.cost_price * p.stock for p in Product.objects.all())
-        low_stock_count = Product.objects.filter(stock__lte=5).count()
+        if self.query:
+            queryset = queryset.filter(
+                Q(name__icontains=self.query) | Q(barcode__icontains=self.query)
+            )
 
-        context = {
-            'products': products_page,
-            'query': query,
-            'selected_category': category_id,
-            'total_products': total_products,
-            'total_stock_value': total_stock_value,
-            'low_stock_count': low_stock_count,
-        }
-        return render(request, 'products/product_list.html', context)
+        if self.category_id:
+            queryset = queryset.filter(category_id=self.category_id)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        total_products = self.model.objects.count()
+
+        total_stock_value = self.model.objects.aggregate(
+            total=Sum(F('cost_price') * F('stock'))
+        )['total'] or 0
+        low_stock_count = self.model.objects.filter(stock__lte=5).count()
+
+        context['query'] = self.query
+        context['selected_category'] = self.category_id
+        context['total_products'] = total_products
+        context['total_stock_value'] = total_stock_value
+        context['low_stock_count'] = low_stock_count
+
+        return context
 
 
-class ProductCreateView(LoginRequiredMixin, RoleRequiredMixin, View):
+class ProductCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
     allowed_roles = ['admin']
+    model = Product
+    form_class = ProductForm
+    template_name = 'products/product_form.html'
+    success_url = reverse_lazy('product_list')
 
-    def get(self, request, *args, **kwargs):
-        form = ProductForm()
-        return render(request, 'products/product_form.html', {'form': form, 'title': "Yangi mahsulot qo'shish"})
-
-    def post(self, request, *args, **kwargs):
-        form = ProductForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('product_list')
-        return render(request, 'products/product_form.html', {'form': form, 'title': "Yangi mahsulot qo'shish"})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Yangi mahsulot qo'shish"
+        return context
 
 
-class ProductUpdateView(LoginRequiredMixin, RoleRequiredMixin, View):
+class ProductUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
     allowed_roles = ['admin']
+    model = Product
+    form_class = ProductForm
+    template_name = 'products/product_form.html'
+    success_url = reverse_lazy('product_list')
+    pk_url_kwarg = 'pk'
 
-    def get(self, request, pk, *args, **kwargs):
-        product = get_object_or_404(Product, pk=pk)
-        form = ProductForm(instance=product)
-        return render(request, 'products/product_form.html', {'form': form, 'title': "Mahsulotni tahrirlash"})
-
-    def post(self, request, pk, *args, **kwargs):
-        product = get_object_or_404(Product, pk=pk)
-        form = ProductForm(request.POST, instance=product)
-        if form.is_valid():
-            form.save()
-            return redirect('product_list')
-        return render(request, 'products/product_form.html', {'form': form, 'title': "Mahsulotni tahrirlash"})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Mahsulotni tahrirlash"
+        return context
 
 
-class ProductDeleteView(LoginRequiredMixin, RoleRequiredMixin, View):
+class ProductDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
     allowed_roles = ['admin']
-
-    def get(self, request, pk, *args, **kwargs):
-        product = get_object_or_404(Product, pk=pk)
-        return render(request, 'products/product_confirm_delete.html', {'product': product})
-
-    def post(self, request, pk, *args, **kwargs):
-        product = get_object_or_404(Product, pk=pk)
-        product.delete()
-        return redirect('product_list')
+    model = Product
+    template_name = 'products/product_confirm_delete.html'
+    success_url = reverse_lazy('product_list')
+    context_object_name = 'product'
+    pk_url_kwarg = 'pk'
 
 
 class ExportProductsPDFView(LoginRequiredMixin, RoleRequiredMixin, View):
@@ -142,7 +145,7 @@ class ExportProductsExcelView(RoleRequiredMixin, View):
         for p in Product.objects.all():
             ws.append([
                 p.name,
-                p.barcode,
+                p.barcode or "-",
                 float(p.cost_price),
                 float(p.sell_price),
                 p.stock

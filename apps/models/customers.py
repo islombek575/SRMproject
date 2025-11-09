@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.db.models import Model, CharField, DecimalField, DateTimeField
+from django.db.models import CharField, DateTimeField, DecimalField, Model
 
 
 class Customer(Model):
