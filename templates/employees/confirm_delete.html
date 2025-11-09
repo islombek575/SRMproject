@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto p-4 max-w-md">
+    <div class="bg-white p-6 shadow rounded-lg text-center">
+        <h1 class="text-xl font-bold mb-4">Xodimni o‘chirish</h1>
+        <p class="mb-4">{{ employee.first_name }} {{ employee.last_name }} ni o‘chirishni xohlaysizmi?</p>
+        <form method="POST" class="flex justify-center gap-4">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600">Ha, o‘chirish</button>
+            <a href="{% url 'employee_list' %}" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">Bekor qilish</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

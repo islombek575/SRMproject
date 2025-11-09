@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mx-auto py-6 max-w-2xl">
+        <h2 class="text-3xl font-bold mb-6">To'lov: {{ debt.customer.name }}</h2>
+
+        {% for message in messages %}
+            <div class="p-3 mb-2 rounded {{ message.tags }} text-dark">{{ message }}</div>
+        {% endfor %}
+
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <p class="text-lg mb-2">Umumiy qarz: <span class="font-bold">{{ debt.amount }} so'm</span></p>
+            <p class="text-lg mb-2">Allaqachon to'langan: <span class="font-bold">{{ debt.paid_amount }} so'm</span></p>
+            <p class="text-lg mb-4">Qolgan: <span class="font-bold">{{ debt.remaining|default:0 }} so'm</span></p>
+
+            {% if debt.status != 'paid' %}
+                <form method="post" class="flex flex-col gap-4">
+                    {% csrf_token %}
+                    {{ form.amount.label_tag }}
+                    {{ form.amount }}
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                        To'lov qilish
+                    </button>
+                    <a href="{% url 'customer_list' %}"
+                       class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition shadow">
+                        Orqaga
+                    </a>
+                </form>
+            {% else %}
+                <span class="px-3 py-1 bg-green-500 text-white rounded-full">Bu qarz to'langan</span>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

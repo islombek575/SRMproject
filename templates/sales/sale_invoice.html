@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: sans-serif; font-size: 14px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+        th { background: #f4f4f4; }
+        .total { font-weight: bold; text-align: right; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🧾 Chek</h2>
+        <p>Sotuv ID: {{ sale.id }}</p>
+        <p>Sana: {{ sale.created_at|date:"Y-m-d H:i" }}</p>
+    </div>
+
+    <p><strong>Mijoz:</strong> {{ sale.customer.name|default:"-" }}</p>
+    <p><strong>Sotuvchi:</strong> {{ sale.cashier.username|default:"-" }}</p>
+    <p><strong>To‘lov turi:</strong> {{ sale.get_payment_type_display }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Mahsulot</th>
+                <th>Miqdor</th>
+                <th>Narx</th>
+                <th>Jami</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in sale.items.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }} so‘m</td>
+                <td>{{ item.subtotal }} so‘m</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p class="total">Umumiy: {{ sale.total_amount }} so‘m</p>
+</body>
+</html>

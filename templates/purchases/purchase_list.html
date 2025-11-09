@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+    <div class="container mx-auto p-4 bg-gray-100 min-h-screen">
+
+        <!-- Sarlavha -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
+            <h1 class="text-3xl font-bold text-gray-800">Xaridlar</h1>
+            <div class="text-lg font-semibold text-gray-700">
+                Umumiy xarajat: <span class="text-green-600">{{ total_sales|floatformat:0|intcomma }} UZS</span>
+            </div>
+        </div>
+
+        <!-- Filter & Add -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+            <form method="get" class="flex flex-wrap items-center gap-2">
+                <label for="date" class="font-medium">Sana bo‘yicha filter:</label>
+                <input type="date" id="date" name="date" value="{{ selected_date }}" class="border rounded px-2 py-1">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition">
+                    Filtrlash
+                </button>
+                <a href="{% url 'purchase_list' %}" class="ml-2 text-gray-600 hover:underline">Tozalash</a>
+            </form>
+
+            <a href="{% url 'add_purchase' %}"
+               class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+                ➕ Xarid qo‘shish
+            </a>
+        </div>
+
+        <!-- Purchases Table -->
+        <div class="overflow-x-auto bg-white rounded shadow">
+            <table class="min-w-full">
+                <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-4 py-2 text-left">#</th>
+                    <th class="px-4 py-2 text-left">Xarid ID</th>
+                    <th class="px-4 py-2 text-left">Umumiy summa</th>
+                    <th class="px-4 py-2 text-left">Sana</th>
+                    <th class="px-4 py-2 text-left">Holat</th>
+                    <th class="px-4 py-2 text-center">Amallar</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for purchase in purchases %}
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="px-4 py-2">{{ forloop.counter }}</td>
+                        <td onclick="window.location.href='{% url 'purchase_detail' purchase.id %}'"
+                            class="px-4 py-2 text-blue-600 font-semibold cursor-pointer">
+                            {{ purchase.id }}
+                        </td>
+                        <td class="px-4 py-2">{{ purchase.total_price|floatformat:0|intcomma }} UZS</td>
+                        <td class="px-4 py-2">{{ purchase.purchased_at|date:"d-m-Y H:i" }}</td>
+                        <td class="px-4 py-2">
+                            {% if purchase.status == "PENDING" %}
+                                <span class="inline-block px-3 py-1 text-sm font-medium text-yellow-800 bg-yellow-200 rounded-full">Kutilmoqda</span>
+                            {% elif purchase.status == "COMPLETED" %}
+                                <span class="inline-block px-3 py-1 text-sm font-medium text-green-800 bg-green-200 rounded-full">Yakunlangan</span>
+                            {% else %}
+                                <span class="inline-block px-3 py-1 text-sm font-medium text-red-800 bg-red-200 rounded-full">Bekor qilingan</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2 text-center space-x-2">
+                            {% if purchase.status == "PENDING" %}
+                                <form method="post" action="{% url 'purchase_complete' purchase.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="inline-block px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition">
+                                        ✅ Yakunlash
+                                    </button>
+                                </form>
+
+                                <form method="post" action="{% url 'purchase_cancel' purchase.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="inline-block px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                                        ❌ Bekor qilish
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="text-gray-400">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-4 py-2 text-center text-gray-500">Hozircha xarid yo‘q</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

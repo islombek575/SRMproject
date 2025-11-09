@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+    <div class="container mx-auto px-4 sm:px-6 py-6">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            <div class="p-5 bg-white rounded-xl shadow flex flex-col hover:shadow-lg transition">
+                <span class="text-gray-400 uppercase text-sm">Jami mahsulotlar</span>
+                <span class="text-3xl font-bold text-gray-800">{{ total_products }}</span>
+            </div>
+
+            <div class="p-5 bg-white rounded-xl shadow flex flex-col hover:shadow-lg transition">
+                <span class="text-gray-400 uppercase text-sm">Ombor qiymati</span>
+                <span class="text-3xl font-bold text-gray-800">{{ total_stock_value|floatformat:0|intcomma }} so'm</span>
+            </div>
+
+            <div class="p-5 bg-white rounded-xl shadow flex flex-col hover:shadow-lg transition">
+                <span class="text-gray-400 uppercase text-sm">Past stokdagi mahsulotlar</span>
+                <span class="text-3xl font-bold text-red-500">{{ low_stock_count }}</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow flex flex-col mb-6 gap-4 hover:shadow-lg transition">
+
+            <form method="get" class="flex flex-col sm:flex-row gap-2 w-full flex-wrap items-end">
+                <div class="w-full sm:w-64">
+                    <label for="q-input" class="text-sm text-gray-500 hidden sm:block">Qidiruv</label>
+                    <input type="text" id="q-input" name="q" placeholder="Mahsulot nomi yoki barcode..."
+                           value="{{ query|default:'' }}"
+                           class="p-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+
+                <div class="w-full sm:w-48">
+                    <label for="category-select" class="text-sm text-gray-500 hidden sm:block">Kategoriya</label>
+                    <select id="category-select" name="category"
+                            class="p-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="">Barchasi</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}"
+                                    {% if cat.id|stringformat:"s" == selected_category %}selected{% endif %}>
+                                {{ cat.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit"
+                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition w-full sm:w-auto">
+                        Filtrlash
+                    </button>
+                    <a href="{% url 'product_list' %}" class="bg-yellow-600 hover:bg-gray-700 px-4 py-2 rounded flex items-center justify-center">
+                        🧹 Tozalash
+                    </a>
+                </div>
+            </form>
+
+            <hr class="border-gray-200">
+
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4">
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <a href="{% url 'export_products_pdf' %}"
+                       class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition w-full sm:w-auto text-center">
+                        📄 PDF chiqarish
+                    </a>
+                    <a href="{% url 'export_products_excel' %}"
+                       class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition w-full sm:w-auto text-center">
+                        📊 Excel chiqarish
+                    </a>
+                </div>
+
+                <a href="{% url 'product_create' %}"
+                   class="px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition whitespace-nowrap w-full sm:w-auto text-center">
+                    Yangi mahsulot qo‘shish
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow overflow-x-auto">
+            <table class="min-w-full text-left border-collapse divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">#</th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">Nomi</th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">Barcode</th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">Sotib olish narxi</th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">Sotish narxi</th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">Soni</th>
+                    <th class="px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">Amallar</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                {% for product in products %}
+                    <tr class="{% if product.is_low_stock %}bg-red-50{% endif %} hover:bg-gray-50 transition">
+                        <td class="px-4 py-2 whitespace-nowrap">{{ forloop.counter }}</td>
+                        <td class="px-4 py-2 font-medium whitespace-nowrap">{{ product.name }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap">{{ product.barcode }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap">{{ product.cost_price|floatformat:0|intcomma }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap">{{ product.sell_price|floatformat:0|intcomma }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap">{{ product.stock }}</td>
+                        <td class="px-4 py-2 flex flex-col sm:flex-row gap-2 whitespace-nowrap">
+                            <a href="{% url 'product_update' product.id %}"
+                               class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition text-center">Tahrirlash</a>
+                            <a href="{% url 'product_delete' product.id %}"
+                               class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition text-center">O‘chirish</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" class="px-4 py-3 text-center text-gray-400">Mahsulot topilmadi</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if products.has_other_pages %}
+            <div class="mt-6 flex justify-center gap-2 flex-wrap">
+                {% if products.has_previous %}
+                    <a href="?page={{ products.previous_page_number }}"
+                       class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition">Oldingi</a>
+                {% endif %}
+
+                {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                        <span class="px-3 py-1 bg-blue-500 text-white rounded">{{ num }}</span>
+                    {% else %}
+                        <a href="?page={{ num }}"
+                           class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+                    <a href="?page={{ products.next_page_number }}"
+                       class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition">Keyingi</a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Purchase #{{ purchase.id }}</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 30px; color: #333; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.header .logo { font-size: 24px; font-weight: bold; color: #2c3e50; }
+.header .info { text-align: right; }
+h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #2c3e50; color: white; }
+tfoot td { font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">My Shop</div>
+    <div class="info">
+        Purchase ID: {{ purchase.id }}<br>
+        Date: {{ purchase.purchased_at|date:"d-m-Y H:i" }}
+    </div>
+</div>
+
+<h2>Purchase Invoice</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price (UZS)</th>
+            <th>Total (UZS)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in purchase.items.all %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.cost_price|floatformat:0|intcomma }}</td>
+            <td>{{ item.total_price|floatformat:0|intcomma }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4">Grand Total</td>
+            <td>{{ purchase.total_price|floatformat:0|intcomma }}</td>
+        </tr>
+    </tfoot>
+</table>
+
+<div style="text-align:center; margin-top:50px; font-size:12px; color:#777;">
+    Thank you for your purchase!
+</div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+    <div class="container mx-auto p-4 bg-gray-100 min-h-screen">
+
+        <!-- Header with title and buttons -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+            <h1 class="text-2xl font-bold text-gray-800">Purchase #{{ purchase.id }}</h1>
+            <div class="flex gap-2">
+                <a href="{% url 'purchase_pdf' purchase.id %}" target="_blank"
+                   class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 transition">Export PDF</a>
+                <a href="{% url 'purchase_list' %}"
+                   class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition">Orqaga</a>
+            </div>
+        </div>
+
+        <!-- Purchase Summary -->
+        <div class="bg-white shadow rounded p-4 mb-6">
+            <p><strong>Total Price:</strong> <span
+                    class="text-green-600">{{ purchase.total_price|floatformat:0|intcomma }} UZS</span></p>
+            <p><strong>Date:</strong> {{ purchase.purchased_at|date:"d-m-Y H:i" }}</p>
+            {% if purchase.status == 'COMPLETED' %}
+                <p><strong>Status:</strong> <span class="text-green-600">{{ purchase.status }}</span></p>
+            {% elif purchase.status == 'PENDING' %}
+                <p><strong>Status:</strong> <span class="text-yellow-600">{{ purchase.status }}</span></p>
+            {% elif purchase.status == 'CANCELLED' %}
+                <p><strong>Status:</strong> <span class="text-red-600">{{ purchase.status }}</span></p>
+            {% endif %}
+        </div>
+
+        <!-- Items Table -->
+        <div class="overflow-x-auto bg-white rounded shadow">
+            <table class="min-w-full">
+                <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-4 py-2 text-left">Product</th>
+                    <th class="px-4 py-2 text-left">Quantity</th>
+                    <th class="px-4 py-2 text-left">Price (UZS)</th>
+                    <th class="px-4 py-2 text-left">Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in purchase.items.all %}
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="px-4 py-2">{{ item.product.name }}</td>
+                        <td class="px-4 py-2">{{ item.quantity }}</td>
+                        <td class="px-4 py-2">{{ item.cost_price|floatformat:0|intcomma }}</td>
+                        <td class="px-4 py-2">{{ item.total_price|floatformat:0|intcomma }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-4 py-2 text-center text-gray-500">Item yo'q</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

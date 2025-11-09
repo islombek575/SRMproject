@@ -1,0 +1,1048 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Savdo — POS Terminal</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>
+            /* ASOSIY CSS QISMI */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+
+            .main-container {
+                background: white;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 1rem 2rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .content-wrapper {
+                display: flex;
+                flex: 1;
+                overflow: hidden;
+            }
+
+            .left-panel {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                padding: 1.5rem;
+                background: #f8f9fa;
+            }
+
+            .total-section {
+                background: white;
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .total-item {
+                text-align: center;
+            }
+
+            .total-label {
+                font-size: 0.85rem;
+                color: #6c757d;
+                margin-bottom: 0.25rem;
+            }
+
+            .total-value {
+                font-size: 2rem;
+                font-weight: 700;
+                color: #2d3748;
+            }
+
+            .total-value.discount {
+                color: #e53e3e;
+            }
+
+            .total-value.payment {
+                color: #667eea;
+            }
+
+            .table-wrapper {
+                background: white;
+                border-radius: 12px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .table-header {
+                background: #f8f9fa;
+                border-bottom: 2px solid #e9ecef;
+            }
+
+            .table-header table {
+                width: 100%;
+                table-layout: fixed;
+            }
+
+            .table-header th {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #495057;
+                text-transform: uppercase;
+            }
+
+            .table-body {
+                flex: 1;
+                overflow-y: auto;
+            }
+
+            .table-body::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .table-body::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            .table-body::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 4px;
+            }
+
+            .table-body::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
+            .table-body table {
+                width: 100%;
+                table-layout: fixed;
+            }
+
+            .table-body td {
+                padding: 0.75rem;
+                border-bottom: 1px solid #f1f3f5;
+                font-size: 0.9rem;
+            }
+
+            /* 🌟 BARCODE INPUT UCHUN TUZATILGAN STYLE 🌟 */
+            .barcode-row {
+                /* Rangni yengilroq qildik */
+                background: linear-gradient(135deg, #f0f4ff 0%, #f6f0ff 100%);
+                border-top: 1px solid #e9ecef;
+                height: 35px; /* Balandlikni biroz oshirdik, kichikroq */
+                transition: all 0.3s ease-in-out;
+                overflow: hidden;
+            }
+
+            .barcode-input-container-cell {
+                /* Faqat № va Kod tagiga to'g'ri tushish uchun */
+                padding: 0 0 0 0.75rem !important;
+                border-bottom: none !important;
+            }
+
+            .barcode-input-wrapper {
+                display: flex;
+                align-items: center;
+                padding: 0;
+                height: 100%;
+            }
+
+            .barcode-input-row-icon {
+                width: 18px; /* Kichikroq icon */
+                height: 18px;
+                color: #667eea;
+                margin-right: 0.5rem;
+            }
+
+            .barcode-input {
+                flex: 1;
+                border: none;
+                background: transparent;
+                font-size: 0.9rem; /* ✅ Yengilroq font */
+                outline: none;
+                padding: 0;
+                color: #2d3748;
+                font-weight: 500;
+            }
+
+            .barcode-input::placeholder {
+                color: #667eea;
+                opacity: 0.5;
+                font-size: 0.9rem;
+            }
+
+            /* 🌟 O'zgarishlar tugadi 🌟 */
+
+            .product-row {
+                transition: background 0.2s, transform 0.2s;
+            }
+
+            .product-row.newly-added {
+                background-color: #d1f7e0 !important;
+                border-left: 4px solid #10b981;
+            }
+
+
+            .product-row:hover {
+                background: #f8f9fa;
+                cursor: pointer;
+            }
+
+            .qty-input {
+                width: 70px;
+                text-align: center;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                padding: 0.4rem;
+                font-weight: 600;
+                font-size: 0.95rem;
+            }
+
+            .qty-input:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .remove-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 1.3rem;
+                transition: transform 0.2s;
+                opacity: 0.7;
+            }
+
+            .remove-btn:hover {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+
+
+            .tab-btn {
+                background: #667eea;
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 6px;
+                margin-right: 1rem;
+                font-weight: 600;
+                border: none;
+            }
+
+            .new-check-btn {
+                color: #10b981;
+                font-weight: 600;
+                cursor: pointer;
+                transition: color 0.2s;
+                background: none;
+                border: none;
+            }
+
+            .new-check-btn:hover {
+                color: #059669;
+            }
+
+            .right-panel {
+                width: 420px;
+                background: white;
+                border-left: 1px solid #e9ecef;
+                display: flex;
+                flex-direction: column;
+                padding: 1.5rem;
+                gap: 1rem;
+            }
+
+            .payment-info {
+                background: #f8f9fa;
+                border-radius: 12px;
+                padding: 1.5rem;
+            }
+
+            .payment-title {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #2d3748;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+            }
+
+            .input-group {
+                margin-bottom: 1rem;
+            }
+
+            .input-label {
+                display: block;
+                font-size: 0.85rem;
+                color: #6c757d;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+            }
+
+            .input-field {
+                width: 100%;
+                padding: 0.75rem;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                font-size: 1rem;
+                transition: all 0.2s;
+                background: white;
+            }
+
+            .input-field:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .input-field.large {
+                font-size: 1.5rem;
+                font-weight: 700;
+            }
+
+            .keypad-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.5rem;
+                flex: 1;
+            }
+
+            .keypad-btn {
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                border: 2px solid #dee2e6;
+                border-radius: 10px;
+                padding: 1rem;
+                font-size: 1.2rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.15s;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .keypad-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .keypad-btn:active {
+                transform: translateY(0);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            }
+
+            .keypad-btn[data-action="delete"] {
+                background: linear-gradient(135deg, #fee 0%, #fdd 100%);
+                color: #e53e3e;
+                border-color: #f5c6cb;
+            }
+
+            .keypad-btn[data-action="fill_total"] {
+                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                color: #d97706;
+                grid-row: span 2;
+                border-color: #fcd34d;
+            }
+
+            .keypad-btn.submit {
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                grid-column: span 4;
+                font-size: 1.1rem;
+                border-color: #10b981;
+            }
+
+            .keypad-btn.submit:hover {
+                background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            }
+
+            .keypad-btn.clear {
+                background: linear-gradient(135deg, #fee 0%, #fdd 100%);
+                color: #e53e3e;
+                grid-column: span 2;
+                font-size: 0.9rem;
+                border-color: #f5c6cb;
+            }
+
+            .keypad-btn.cancel {
+                background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+                color: #6b7280;
+                grid-column: span 2;
+                font-size: 0.9rem;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-color: #d1d5db;
+            }
+
+            .message-container {
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                z-index: 1000;
+                min-width: 320px;
+            }
+
+            .message {
+                background: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                margin-bottom: 0.5rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                display: flex;
+                align-items: center;
+                animation: slideIn 0.3s ease-out;
+                border-left: 4px solid #667eea;
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            .message.success {
+                border-left-color: #10b981;
+            }
+
+            .message.error {
+                border-left-color: #e53e3e;
+            }
+
+            .message.warning {
+                border-left-color: #f59e0b;
+            }
+
+            .hidden {
+                display: none !important;
+            }
+
+            .quick-cash-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            .quick-cash-btn {
+                flex-grow: 1;
+                padding: 0.5rem;
+                border: 1px solid #667eea;
+                border-radius: 6px;
+                background: #e7f3ff;
+                color: #667eea;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.15s;
+                text-align: center;
+                font-size: 0.9rem;
+            }
+
+            .quick-cash-btn:hover {
+                background: #667eea;
+                color: white;
+            }
+        </style>
+    </head>
+
+    <body>
+    <div class="main-container">
+        <div id="top-messages" class="message-container"></div>
+
+        <header class="header">
+            <div style="font-size: 1.5rem; font-weight: 700;">🛒 Savdo - POS Terminal</div>
+            <div id="datetime" style="font-size: 0.9rem; opacity: 0.9;"></div>
+        </header>
+
+        <form id="pos-form" method="POST" action="{% url 'sale_create' %}" class="content-wrapper">
+            {% csrf_token %}
+
+            <div class="left-panel">
+                <div class="total-section">
+                    <div class="total-item">
+                        <div class="total-label">Jami (SUM)</div>
+                        <div class="total-value" id="total-text">0</div>
+                        <input type="hidden" id="total-amount" name="total_amount" value="0">
+                    </div>
+                    <div class="total-item">
+                        <div class="total-label">Chegirma</div>
+                        <div class="total-value discount">0</div>
+                    </div>
+                    <div class="total-item">
+                        <div class="total-label">To'lovga</div>
+                        <div class="total-value payment" id="payment-due">0</div>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <div class="table-header">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th style="width: 50px;">№</th>
+                                <th style="width: 100px;">Kod</th>
+                                <th>Mahsulot nomi</th>
+                                <th style="width: 100px;">Soni</th>
+                                <th style="width: 120px; text-align: right;">Narx</th>
+                                <th style="width: 120px; text-align: right;">Jami</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="table-body">
+                        <table>
+                            <tbody id="cart-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <input type="hidden" name="cart_data" id="cart-data-input">
+            </div>
+
+            <div class="right-panel">
+                <div class="payment-info">
+                    <div class="payment-title">💳 To'lov ma'lumotlari</div>
+
+                    <div class="input-group">
+                        <label class="input-label">To'lov turi</label>
+                        <select name="payment_type" id="payment-type" class="input-field">
+                            <option value="cash">💵 Naqd pul</option>
+                            <option value="card">💳 Plastik karta</option>
+                            <option value="credit">📝 Nasiya (Qarz)</option>
+                        </select>
+                    </div>
+
+                    <div id="customer-name-field" class="input-group hidden">
+                        <label class="input-label">Mijozning to'liq ismi <span style="color: #e53e3e;">*</span></label>
+                        <input name="customer_name" id="customer-name" type="text" class="input-field"
+                               placeholder="Mijoz F.I.SH."/>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Olingan summa</label>
+                        <input name="received_amount" id="received-amount" type="text" class="input-field large"
+                               style="color: #d97706; text-align: right;" value="0" readonly/>
+
+                        <div id="quick-cash-btns" class="quick-cash-buttons hidden">
+                            <button type="button" class="quick-cash-btn" data-value="5000">5,000</button>
+                            <button type="button" class="quick-cash-btn" data-value="10000">10,000</button>
+                            <button type="button" class="quick-cash-btn" data-value="20000">20,000</button>
+                            <button type="button" class="quick-cash-btn" data-value="50000">50,000</button>
+                            <button type="button" class="quick-cash-btn" data-value="100000">100,000</button>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Qaytim / Qarz</label>
+                        <input id="change-amount" disabled class="input-field large"
+                               style="color: #10b981; background: #f9fafb; text-align: right;" value="0"/>
+                    </div>
+                </div>
+
+                <div class="keypad-grid">
+                    <button type="button" class="keypad-btn" data-key="7">7</button>
+                    <button type="button" class="keypad-btn" data-key="8">8</button>
+                    <button type="button" class="keypad-btn" data-key="9">9</button>
+                    <button type="button" class="keypad-btn" data-action="delete">⌫</button>
+
+                    <button type="button" class="keypad-btn" data-key="4">4</button>
+                    <button type="button" class="keypad-btn" data-key="5">5</button>
+                    <button type="button" class="keypad-btn" data-key="6">6</button>
+                    <button type="button" class="keypad-btn" data-action="fill_total">Σ<br><small>JAMI</small></button>
+
+                    <button type="button" class="keypad-btn" data-key="1">1</button>
+                    <button type="button" class="keypad-btn" data-key="2">2</button>
+                    <button type="button" class="keypad-btn" data-key="3">3</button>
+
+                    <button type="button" class="keypad-btn" data-key="00">00</button>
+                    <button type="button" class="keypad-btn" data-key="0">0</button>
+                    <button type="button" class="keypad-btn" data-key=".">.</button>
+
+                    <button id="submit-btn" type="submit" class="keypad-btn submit">✔ Savdoni yakunlash</button>
+
+                    <button type="button" id="clear-cart-btn" class="keypad-btn clear">❌ Tozalash</button>
+                    <a href="{% url 'dashboard' %}" id="cancel-sale-btn" class="keypad-btn cancel">🔄 Bekor qilish</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
+        let focusedKeypadInput = '#received-amount';
+
+        function formatMoney(n) {
+            return Number(n).toLocaleString('uz-UZ', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        }
+
+        function showTopMessage(text, type = 'info') {
+            const id = 'msg-' + Date.now();
+            const container = $('#top-messages');
+            let className = type;
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'warning') icon = '⚠️';
+
+            const el = $(`<div id="${id}" class="message ${className}"><span style="margin-right: 0.75rem; font-size: 1.2rem;">${icon}</span><span>${text}</span></div>`);
+            container.append(el);
+            setTimeout(() => {
+                el.fadeOut(300, () => el.remove());
+            }, 4500);
+        }
+
+        function saveCart() {
+            sessionStorage.setItem('cart', JSON.stringify(cart));
+            $('#cart-data-input').val(JSON.stringify(cart));
+        }
+
+        // Klaviaturada raqam yozish
+        function appendToInput(val) {
+            let targetInput = $(focusedKeypadInput);
+            if (!targetInput.length || targetInput.prop('disabled')) return;
+
+            let currentRawVal = targetInput.val().replace(/[^0-9.]/g, '');
+
+            if (currentRawVal === '0' && val !== '.' && val !== '0' && val !== '00') {
+                currentRawVal = '';
+            }
+
+            let newRawVal;
+            if (val === '.') {
+                if (currentRawVal.indexOf('.') === -1) {
+                    newRawVal = currentRawVal + '.';
+                } else {
+                    return;
+                }
+            } else if (val === '00') {
+                newRawVal = currentRawVal + '00';
+            } else {
+                newRawVal = currentRawVal + val;
+            }
+
+            targetInput.val(newRawVal);
+
+            if (focusedKeypadInput === '#received-amount') {
+                updateTotals();
+            }
+        }
+
+        // Klaviaturada o'chirish
+        function deleteFromInput() {
+            let targetInput = $(focusedKeypadInput);
+            if (!targetInput.length || targetInput.prop('disabled')) return;
+
+            let currentRawVal = targetInput.val().replace(/[^0-9.]/g, '');
+
+            let newVal = currentRawVal.substring(0, currentRawVal.length - 1);
+
+            if (newVal === '' || newVal === '.') {
+                newVal = '0';
+            }
+
+            targetInput.val(newVal);
+
+            if (focusedKeypadInput === '#received-amount') {
+                updateTotals();
+            }
+        }
+
+        function updateTotals() {
+            let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            $('#total-text').text(formatMoney(total));
+            $('#payment-due').text(formatMoney(total));
+            $('#total-amount').val(total.toFixed(2));
+
+            let receivedStr = $('#received-amount').val().replace(/[^0-9.]/g, '');
+            let received = parseFloat(receivedStr) || 0;
+
+            updateChange(total, received);
+
+            $('#submit-btn').prop('disabled', total === 0);
+            $('#submit-btn').text(total === 0 ? 'Savatcha bo‘sh' : '✔ Savdoni yakunlash');
+        }
+
+        function updateChange(total, received) {
+            const paymentType = $('#payment-type').val();
+            let change = received - total;
+
+            if (change < 0) {
+                if (paymentType === 'credit') {
+                    $('#change-amount').val(`Qarz: ${formatMoney(Math.abs(change))}`);
+                } else {
+                    $('#change-amount').val(`Yetmaydi: ${formatMoney(Math.abs(change))}`);
+                }
+                $('#change-amount').css('color', '#e53e3e');
+            } else {
+                $('#change-amount').val(formatMoney(change));
+                $('#change-amount').css('color', '#10b981');
+            }
+        }
+
+        function handleRemoveLine() {
+            const idx = parseInt($(this).data('idx'));
+            const item = cart[idx];
+            cart.splice(idx, 1);
+            saveCart();
+            renderCart();
+            showTopMessage(`${item.name} olib tashlandi`, 'warning');
+        }
+
+        function handleQuantityChange() {
+            const input = $(this);
+            const idx = parseInt(input.data('idx'));
+            let newQty = parseFloat(input.val());
+            const item = cart[idx];
+
+            if (isNaN(newQty) || newQty <= 0) {
+                newQty = 1;
+                input.val(1);
+            }
+
+            if (newQty > item.stock) {
+                showTopMessage(`❌ ${item.name}: Omborda faqat ${item.stock} dona/kg mavjud!`, 'error');
+                input.val(item.qty);
+                return;
+            }
+
+            item.qty = newQty;
+            saveCart();
+
+            const lineTotal = item.price * item.qty;
+            input.closest('tr').find('.line-total').text(formatMoney(lineTotal));
+
+            updateTotals();
+        }
+
+        // DINAMIK RENDER FUNKSIYASI - TUZATILDI
+        function renderCart(newlyAddedProduct = null) {
+            const tbody = $('#cart-body');
+            tbody.empty();
+
+            for (let i = 0; i < cart.length; i++) {
+                const item = cart[i];
+                const lineTotal = item.price * item.qty;
+
+                // Yangi qo'shilgan mahsulotni ajratib turish (faqat 1 sekundga)
+                const isNewlyAdded = (newlyAddedProduct && i === 0 && item.barcode === newlyAddedProduct.barcode);
+
+                const row = `
+                        <tr class="product-row ${isNewlyAdded ? 'newly-added' : ''}">
+                            <td style="width: 50px; text-align: center; color: #6c757d; font-weight: 600;">${i + 1}</td>
+                            <td style="width: 100px; font-family: monospace; font-weight: 500;">${item.barcode}</td>
+                            <td style="font-weight: 600; color: #2d3748;">${item.name}</td>
+                            <td style="width: 100px; text-align: center;">
+                                <input type="number" min="0.01" step="any" value="${item.qty}" data-idx="${i}" class="qty-input">
+                            </td>
+                            <td style="width: 120px; text-align: right; color: #495057;">${formatMoney(item.price)}</td>
+                            <td style="width: 120px; text-align: right; font-weight: 700; color: #10b981;"><span class="line-total">${formatMoney(lineTotal)}</span></td>
+                            <td style="width: 50px; text-align: center;">
+                                <button type="button" class="remove-line remove-btn" data-idx="${i}">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                tbody.append(row);
+            }
+
+            // 🌟 BARCODE INPUT № VA KOD USTUNLARI TAGIDA JOPYLASHTIRISH (RASMDAGI KABI YENGIL KO'RINISH) 🌟
+            const barcodeRow = `
+                    <tr class="barcode-row">
+                        <td colspan="2" class="barcode-input-container-cell">
+                            <div class="barcode-input-wrapper">
+                                <svg class="barcode-input-row-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                                <input id="barcode-input" type="text" class="barcode-input" placeholder="Kod kiritish/skanerlash..." autofocus autocomplete="off">
+                            </div>
+                        </td>
+                        <td colspan="5" style="padding: 0; border-bottom: none !important;"></td>
+                    </tr>
+                `;
+            tbody.append(barcodeRow);
+
+
+            updateTotals();
+
+            setTimeout(() => {
+                $('#barcode-input').focus();
+                if (newlyAddedProduct) {
+                    setTimeout(() => {
+                        $('.newly-added').removeClass('newly-added');
+                    }, 1000);
+                }
+            }, 100);
+
+            const scrollContainer = $('.table-body');
+            // ENG PASTGA SCROLL
+            scrollContainer.scrollTop(scrollContainer.prop("scrollHeight"));
+
+
+            $('#barcode-input').off('keypress').on('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    getProduct();
+                }
+            });
+
+            focusedKeypadInput = '#received-amount';
+
+            $('#cart-body').off('click', '.remove-line').on('click', '.remove-line', handleRemoveLine);
+            $('#cart-body').off('change', '.qty-input').on('change', '.qty-input', handleQuantityChange);
+            $('#cart-body').off('input', '.qty-input').on('input', '.qty-input', handleQuantityChange);
+        }
+
+        function getProduct() {
+            const code = $('#barcode-input').val().trim();
+            if (!code) return;
+
+            $('#barcode-input').val('');
+
+            // !!! Bu yerda sizning Django/Flask/PHP orqa qismingizdan mahsulot ma'lumotlarini olish kodi bo'lishi kerak
+            // Taxmin qilinayotgan URL: /api/get-product?barcode=...
+            $.get("{% url 'get_product' %}", {barcode: code})
+                .done(function (data) {
+                    if (!data.success) {
+                        showTopMessage(data.message || 'Mahsulot topilmadi!', 'error');
+                        renderCart();
+                        return;
+                    }
+
+                    const stock = Number(data.stock || 0);
+                    const existingIndex = cart.findIndex(p => p.barcode === data.barcode);
+                    const qtyToAdd = 1;
+                    let addedItem = null;
+
+                    if (existingIndex !== -1) {
+                        const existing = cart[existingIndex];
+                        const newQty = existing.qty + qtyToAdd;
+
+                        if (newQty > stock) {
+                            showTopMessage(`❌ ${data.name}: Omborda faqat ${stock} dona mavjud (Savatda: ${existing.qty})`, 'error');
+                            renderCart();
+                            return;
+                        }
+                        existing.qty = newQty;
+                        // MAHSULOTNI TEPAGA KO'TARISH (DINAMIKLIK)
+                        const movedItem = cart.splice(existingIndex, 1)[0];
+                        cart.unshift(movedItem);
+                        addedItem = movedItem;
+                    } else {
+                        if (qtyToAdd > stock) {
+                            showTopMessage(`❌ ${data.name}: Omborda faqat ${stock} dona mavjud`, 'error');
+                            renderCart();
+                            return;
+                        }
+                        addedItem = {
+                            barcode: data.barcode,
+                            name: data.name,
+                            price: Number(data.price),
+                            qty: qtyToAdd,
+                            stock: stock
+                        };
+                        cart.unshift(addedItem); // Savatning boshiga qo'shish
+                    }
+
+                    saveCart();
+                    // RENDER QILISHDA YANGI QO'SHILGAN MAHSULOTNI UZATAMIZ
+                    renderCart(addedItem);
+                    showTopMessage(`✅ ${data.name} qo'shildi!`, 'success');
+                })
+                .fail(function () {
+                    showTopMessage('Server bilan aloqa xatosi yoki mahsulot topilmadi!', 'error');
+                    renderCart();
+                });
+        }
+
+
+        $(document).ready(function () {
+            function updateTime() {
+                document.getElementById("datetime").textContent = new Date().toLocaleString('uz-UZ', {
+                    dateStyle: 'short',
+                    timeStyle: 'medium'
+                });
+            }
+
+            setInterval(updateTime, 1000);
+            updateTime();
+
+            renderCart();
+
+            $('#received-amount').on('input', function () {
+                let value = $(this).val().replace(/[^0-9.]/g, '');
+                $(this).val(value);
+                updateTotals();
+            });
+
+            $('#payment-type').on('change', function () {
+                const total = parseFloat($('#total-amount').val()) || 0;
+                const type = $(this).val();
+                const receivedAmountInput = $('#received-amount');
+
+                $('#quick-cash-btns').addClass('hidden');
+                $('#customer-name-field').addClass('hidden');
+
+                if (type === 'credit') {
+                    $('#customer-name-field').removeClass('hidden');
+                    receivedAmountInput.val('0');
+                } else if (type === 'cash') {
+                    receivedAmountInput.val('0');
+                    $('#quick-cash-btns').removeClass('hidden');
+                } else if (type === 'card') {
+                    receivedAmountInput.val(total.toFixed(2));
+                }
+
+                updateTotals();
+            }).trigger('change');
+
+            $(".keypad-btn").click(function () {
+                const action = $(this).data("action");
+                const val = $(this).data("key");
+
+                if (action === 'delete') {
+                    deleteFromInput();
+                } else if (action === 'fill_total') {
+                    if ($(focusedKeypadInput).attr('id') === 'received-amount') {
+                        const total = parseFloat($('#total-amount').val()) || 0;
+                        $(focusedKeypadInput).val(total.toFixed(2));
+                        updateTotals();
+                    }
+                } else if (val !== undefined) {
+                    appendToInput(val);
+                }
+            });
+
+            $('.quick-cash-btn').on('click', function () {
+                const targetInput = $('#received-amount');
+                const addedValue = parseFloat($(this).data('value'));
+
+                let currentRawVal = targetInput.val().replace(/[^0-9.]/g, '');
+                let currentValue = parseFloat(currentRawVal) || 0;
+
+                let newValue = currentValue + addedValue;
+
+                targetInput.val(newValue.toFixed(0));
+                updateTotals();
+            });
+
+            // SAVDONI YAKUNLASH VA TOZALASH
+            $('#pos-form').on('submit', function (e) {
+                e.preventDefault();
+                const form = $(this);
+                if (cart.length === 0) {
+                    showTopMessage("❌ Savatcha bo‘sh. Mahsulot qo'shing!", 'error');
+                    e.preventDefault();
+                    return;
+                }
+
+                const total = parseFloat($('#total-amount').val()) || 0;
+                const received = parseFloat($('#received-amount').val().replace(/[^0-9.]/g, '')) || 0;
+                const paymentType = $('#payment-type').val();
+                const customerName = $('#customer-name').val().trim();
+
+
+                if (paymentType === 'credit') {
+                    if (customerName.length < 3) {
+                        showTopMessage("❌ Nasiya uchun mijoz ismini to'liq kiriting!", 'error');
+                        e.preventDefault();
+                        $('#customer-name').focus();
+                        return;
+                    }
+                } else if (paymentType !== 'card' && received < total) {
+                    showTopMessage("❌ Olingan summa umumiy summadan kam!", 'error');
+                    e.preventDefault();
+                    return;
+                }
+
+                $('#cart-data-input').val(JSON.stringify(cart));
+
+                const formData = new FormData(form[0]);
+
+                $.ajax({
+                    type: form.attr('method'),
+                    url: form.attr('action'),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        // Agar serverdan "success: true" kelsa
+                        if (response.success) {
+                            let change = received - total;
+                            let message = "Savdo muvaffaqiyatli yakunlandi!";
+
+                            if (paymentType === 'credit') {
+                                message += ` Qarz: ${formatMoney(Math.abs(change))}`;
+                            } else if (change > 0) {
+                                message += ` Qaytim: ${formatMoney(change)}`;
+                            }
+                            showTopMessage(message, 'success');
+
+                            sessionStorage.removeItem('cart');
+
+                        } else {
+                            // Agar server xato ma'lumot bersa
+                            showTopMessage(response.message || 'Serverda xatolik yuz berdi!', 'error');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        showTopMessage('Server bilan aloqa xatosi: ' + xhr.status, 'error');
+                    }
+                });
+            });
+
+            $('#cancel-sale-btn').on('click', function () {
+                sessionStorage.removeItem('cart');
+            });
+
+            $('#clear-cart-btn').on('click', function () {
+                cart = [];
+                saveCart();
+                renderCart();
+                showTopMessage("Savatcha tozalandi!", 'warning');
+            });
+
+            // BOSHQA PAGEGA O'TIB KETSA HAM TOZALASH
+            window.addEventListener('unload', function () {
+                sessionStorage.removeItem('cart');
+            });
+
+            // Avtofokusni ta'minlash
+            $(document).on('click', function (e) {
+                // Agar bosilgan joy input, select, yoki klaviatura buttoni bo'lmasa, barcode inputga focus berish
+                if (!$(e.target).closest('.keypad-btn, input, select').length) {
+                    $('#barcode-input').focus();
+                }
+            });
+
+        });
+    </script>
+{% endblock %}

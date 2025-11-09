@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-6 rounded shadow text-center">
+    <h1 class="text-xl font-bold mb-4">Mahsulotni o‘chirish</h1>
+    <p class="mb-4">Siz <span class="font-semibold">{{ product.name }}</span> mahsulotini o‘chirib tashlamoqchimisiz?</p>
+    <form method="post" class="flex justify-center gap-4">
+        {% csrf_token %}
+        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Ha, o‘chirish</button>
+        <a href="{% url 'product_list' %}" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Bekor qilish</a>
+    </form>
+</div>
+{% endblock %}

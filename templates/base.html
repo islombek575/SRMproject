@@ -1,0 +1,217 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DILYORBEK SAVDO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        /* Asl holatdagi CSS lar */
+        .sidebar-collapsed .menu-text {
+            display: none; /* Menyu matnlari yashiriladi */
+        }
+
+        .sidebar-collapsed .logo-text {
+            display: none;
+        }
+
+        .logo-img,
+        .profile-img {
+            width: 40px; /* 10rem */
+            height: 40px;
+            transition: all 0.4s ease-in-out;
+        }
+
+        .transition-all {
+            transition: all 0.4s ease-in-out;
+        }
+
+        /* --- Mobilga moslashuv qo'shimchasi --- */
+        /* Telefon ekranida (640px dan kichik) sidebar default holatda yashirinadi */
+        @media (max-width: 639px) {
+            #sidebar {
+                transform: translateX(-100%); /* To'liq yashirish */
+                position: fixed; /* Kontentni ustiga chiqish uchun */
+                z-index: 50; /* Eng ustida turishi uchun */
+                height: 100vh; /* To'liq ekran balandligi */
+                /* width: 0; endi JavaScript orqali boshqariladi */
+            }
+
+            /* Sidebar ochilganda */
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            /* Asosiy kontent o'ng tomonda turishi kerak, chunki sidebar fixed */
+            #main-content {
+                padding-left: 0;
+                padding-right: 0;
+            }
+        }
+    </style>
+
+</head>
+
+<div id="messageBox" class="hidden fixed top-5 right-5 z-50"></div>
+
+
+<body class="bg-gray-100 flex font-sans min-h-screen" style="
+        background-image: url('{% static 'market2.jpg' %}');
+        background-size: cover;
+        background-position: initial;
+        background-repeat: no-repeat;
+        ">
+
+<header class="fixed top-0 left-0 right-0 bg-gradient-to-r from-black via-gray-900 to-gray-800 text-white p-3 shadow-md z-40 sm:hidden">
+    <div class="flex justify-between items-center">
+        <button onclick="toggleMobileSidebar()" class="text-white">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+        <span class="text-lg font-bold">DILYORBEK SAVDO</span>
+        <div></div> </div>
+</header>
+
+
+<div id="sidebar"
+     class="w-64 bg-gradient-to-b from-black via-gray-900 to-gray-800 text-gray-200 flex flex-col shadow-xl transition-all duration-500 ease-in-out">
+
+    <div class="hidden sm:flex items-center justify-between p-4 border-b border-gray-700">
+        <div class="flex items-center gap-3">
+            <img src="{% static 'logo.png' %}" class="logo-img rounded-full ring-2 ring-blue-500" alt="logo">
+            <span class="logo-text text-lg font-bold tracking-wide transition-all duration-500">DILYORBEK SAVDO</span>
+        </div>
+        <button onclick="toggleDesktopSidebar()" class="text-gray-300 hover:text-white transition">
+            <i id="sidebar-icon" class="fas fa-angle-left"></i>
+        </button>
+    </div>
+
+    {% if user.is_authenticated %}
+        <div class="p-4 border-b border-gray-700 transition-all duration-500">
+            <a href="{% url 'profile' %}" class="flex items-center gap-3 hover:bg-gray-700 rounded-lg p-1">
+                <img src="{% static 'profile-image.png' %}" class="profile-img rounded-full ring-2 ring-purple-500"
+                     alt="profile">
+                <div class="menu-text transition-all duration-500">
+                    <p class="font-medium">{{ user.username }}</p>
+                    <p class="text-xs text-gray-400 capitalize">{{ user.role }}</p>
+                </div>
+            </a>
+        </div>
+    {% endif %}
+
+
+    <nav class="flex-1 p-4 space-y-3 overflow-y-auto">
+        {% if user.is_authenticated and user.role == 'admin' %}
+            <p class="text-xs text-gray-400 uppercase tracking-wide mb-2 menu-text">Asosiy bo'lim</p>
+            <a href="{% url 'dashboard' %}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-home w-5"></i> <span class="menu-text">Asosiy menyu</span>
+            </a>
+            <a href="{% url 'product_list' %}"
+               class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-box w-5"></i> <span class="menu-text">Mahsulotlar</span>
+            </a>
+            <a href="{% url 'purchase_list' %}"
+               class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-shopping-cart w-5"></i> <span class="menu-text">Xaridlar</span>
+            </a>
+            <a href="{% url 'employee_list' %}"
+               class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-users w-5"></i> <span class="menu-text">Xodimlar</span>
+            </a>
+            <a href="{% url 'sale_create' %}"
+               class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-cash-register w-5"></i> <span class="menu-text">Savdoni boshlash</span>
+            </a>
+            <a href="{% url 'sale_history' %}"
+               class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-history w-5"></i> <span class="menu-text">Tarix</span>
+            </a>
+            <a href="{% url 'reports' %}"
+               class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-chart-line w-5"></i> <span class="menu-text">Hisobotlar</span>
+            </a>
+            <a href="{% url 'customer_list' %}"
+               class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-hand-holding-usd w-5"></i> <span class="menu-text">Qarizlar (Nasiyalar)</span>
+            </a>
+        {% endif %}
+    </nav>
+
+</div>
+
+<div id="main-content" class="flex-1 p-8 pt-16 sm:pt-8">
+    {% if user.is_authenticated and user.role == 'admin' %}
+        {% block content %}
+            <h1 class="text-3xl font-bold text-gray-800">Asosiy menyu</h1>
+            <p class="mt-2 text-gray-600">Xush kelibsiz <span class="font-semibold">Dilyorbek Savdo</span> tizimiga!</p>
+        {% endblock %}
+    {% else %}
+        {% block sales_for_employees %}
+        {% endblock %}
+    {% endif %}
+</div>
+
+
+<script>
+    // Mobil Sidebar uchun funksiya
+    function toggleMobileSidebar() {
+        let sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+    }
+
+    // Katta ekran Sidebar uchun funksiya
+    function toggleDesktopSidebar() {
+        let sidebar = document.getElementById('sidebar');
+        let icon = document.getElementById('sidebar-icon');
+
+        // Agar mobil rejimda bo'lmasa ishlaydi
+        if (window.innerWidth >= 640) {
+            sidebar.classList.toggle('sidebar-collapsed');
+
+            if (sidebar.classList.contains('w-64')) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-16');
+                icon.classList.remove('fa-angle-left');
+                icon.classList.add('fa-angle-right');
+            } else {
+                sidebar.classList.remove('w-16');
+                sidebar.classList.add('w-64');
+                icon.classList.remove('fa-angle-right');
+                icon.classList.add('fa-angle-left');
+            }
+        } else {
+            // Mobil rejimda ishlamaydi, mobile funksiyani chaqirish kerak
+            toggleMobileSidebar();
+        }
+    }
+
+    // Asl funksiyani o'zgartirish: Endi u faqat katta ekran uchun ishlaydi
+    const toggleSidebar = toggleDesktopSidebar;
+</script>
+
+<script src="//unpkg.com/alpinejs" defer></script>
+<script>
+    function showMessage(text, type = "info") {
+        let box = document.getElementById("messageBox");
+        box.innerText = text;
+        box.classList.remove("hidden");
+
+        if (type === "error") {
+            box.className = "fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg bg-red-600 text-white font-medium";
+        } else if (type === "success") {
+            box.className = "fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg bg-green-600 text-white font-medium";
+        } else if (type === "warning") {
+            box.className = "fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg bg-yellow-500 text-white font-medium";
+        } else {
+            box.className = "fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg bg-blue-500 text-white font-medium";
+        }
+
+        setTimeout(() => {
+            box.classList.add("hidden");
+        }, 4000);
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</body>
+</html>

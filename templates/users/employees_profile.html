@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+<div class="max-w-3xl w-full bg-white shadow-xl rounded-2xl overflow-hidden">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-32 relative">
+        <div class="absolute -bottom-16 left-8">
+            <img src="{% static 'profile-image.png' %}" alt="Profile Image"
+                 class="w-32 h-32 rounded-full ring-4 ring-white object-cover shadow-xl">
+        </div>
+    </div>
+
+    <!-- User info -->
+    <div class="pt-20 pb-8 px-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">{{ user.username }}</h2>
+                <p class="text-gray-500">{{ user.email }}</p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3 mt-4 md:mt-0">
+                <!-- Orqaga -->
+                <a href="javascript:history.back()"
+                   class="px-5 py-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition">
+                    ⬅️ Orqaga
+                </a>
+
+                <!-- Parolni o'zgartirish -->
+                <a href="{% url 'password_change' %}"
+                   class="px-5 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow-md transition">
+                    🔑 Parolni o‘zgartirish
+                </a>
+
+                <!-- Chiqish -->
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md transition">
+                        🚪 Chiqish
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Qo‘shimcha info -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-4 bg-gray-50 rounded-xl shadow-inner">
+                <h3 class="text-sm text-gray-400">👤 Username</h3>
+                <p class="font-semibold text-gray-800">{{ user.username }}</p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-xl shadow-inner">
+                <h3 class="text-sm text-gray-400">📧 Email</h3>
+                <p class="font-semibold text-gray-800">{{ user.email }}</p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-xl shadow-inner">
+                <h3 class="text-sm text-gray-400">🛠 Rol</h3>
+                <p class="font-semibold text-gray-800">{{ user.role|default:"Foydalanuvchi" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

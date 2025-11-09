@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="p-6 bg-gray-900 text-white min-h-screen">
+        <h1 class="text-2xl font-bold mb-6">📊 Hisobotlar paneli</h1>
+
+        <!-- Sana filter -->
+        <form method="get" class="flex gap-4 mb-6 items-center">
+            <input type="date" name="start_date" value="{{ start_date }}"
+                   class="px-3 py-2 rounded bg-gray-700 text-white">
+            <input type="date" name="end_date" value="{{ end_date }}" class="px-3 py-2 rounded bg-gray-700 text-white">
+
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">🔍 Filtrlash</button>
+
+            <!-- Tozalash tugmasi -->
+            <a href="{% url 'reports' %}" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded">🧹 Tozalash</a>
+        </form>
+
+        <!-- Bugungi KPI -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-green-600 p-4 rounded-lg shadow text-center">
+                <h3 class="font-semibold">Bugungi tushum</h3>
+                <p class="text-2xl font-bold">{{ today_revenue }} so‘m</p>
+            </div>
+            <div class="bg-blue-600 p-4 rounded-lg shadow text-center">
+                <h3 class="font-semibold">Bugungi foyda</h3>
+                <p class="text-2xl font-bold">{{ today_profit }} so‘m</p>
+            </div>
+            <div class="bg-yellow-500 p-4 rounded-lg shadow text-center">
+                <h3 class="font-semibold">Bugungi xarajat</h3>
+                <p class="text-2xl font-bold">{{ today_expenses }} so‘m</p>
+            </div>
+            <div class="bg-purple-600 p-4 rounded-lg shadow text-center">
+                <h3 class="font-semibold">Bugungi sof foyda</h3>
+                <p class="text-2xl font-bold">{{ today_net }} so‘m</p>
+            </div>
+        </div>
+
+        <!-- Umumiy KPI -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-green-600 p-4 rounded-lg shadow text-center">
+                <h3 class="font-semibold">Umumiy tushum</h3>
+                <p class="text-2xl font-bold">{{ total_revenue }} so‘m</p>
+            </div>
+            <div class="bg-blue-600 p-4 rounded-lg shadow text-center">
+                <h3 class="font-semibold">Umumiy foyda</h3>
+                <p class="text-2xl font-bold">{{ total_profit }} so‘m</p>
+            </div>
+            <div class="bg-yellow-500 p-4 rounded-lg shadow text-center">
+                <h3 class="font-semibold">Xarajatlar</h3>
+                <p class="text-2xl font-bold">{{ total_expenses }} so‘m</p>
+            </div>
+            <div class="bg-purple-600 p-4 rounded-lg shadow text-center">
+                <h3 class="font-semibold">Sof foyda</h3>
+                <p class="text-2xl font-bold">{{ net_profit }} so‘m</p>
+            </div>
+        </div>
+
+        <!-- Grafiklar -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-800 p-4 rounded-lg shadow">
+                <h2 class="mb-3 font-semibold">Top 5 mahsulot</h2>
+                <canvas id="topProductsChart"></canvas>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg shadow">
+                <h2 class="mb-3 font-semibold">To‘lov turlari</h2>
+                <canvas id="paymentChart"></canvas>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg shadow">
+                <h2 class="mb-3 font-semibold">Kunlik trend</h2>
+                <canvas id="dailyChart"></canvas>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg shadow md:col-span-2">
+                <h2 class="mb-3 font-semibold">Kassir samaradorligi</h2>
+                <canvas id="cashierChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const topProducts = {{ top_products|safe }};
+        const paymentStats = {{ payment_stats|safe }};
+        const cashierStats = {{ cashier_stats|safe }};
+        const dailyStats = {{ daily_stats|safe }};
+
+        // Top products
+        new Chart(document.getElementById("topProductsChart"), {
+            type: 'bar',
+            data: {
+                labels: topProducts.map(p => p.product__name),
+                datasets: [{
+                    label: "Soni",
+                    data: topProducts.map(p => p.qty),
+                    backgroundColor: "rgba(34,197,94,0.7)"
+                }]
+            }
+        });
+
+        // Payment types
+        new Chart(document.getElementById("paymentChart"), {
+            type: 'pie',
+            data: {
+                labels: paymentStats.map(p => p.payment_type),
+                datasets: [{
+                    data: paymentStats.map(p => p.total),
+                    backgroundColor: ["#22c55e", "#3b82f6", "#f59e0b"]
+                }]
+            }
+        });
+
+        // Daily trend
+        new Chart(document.getElementById("dailyChart"), {
+            type: 'line',
+            data: {
+                labels: dailyStats.map(d => d.day),
+                datasets: [
+                    {
+                        label: "Tushum",
+                        data: dailyStats.map(d => d.revenue),
+                        borderColor: "#3b82f6",
+                        fill: false
+                    },
+                    {
+                        label: "Foyda",
+                        data: dailyStats.map(d => d.profit),
+                        borderColor: "#22c55e",
+                        fill: false
+                    }
+                ]
+            }
+        });
+
+        // Cashier
+        new Chart(document.getElementById("cashierChart"), {
+            type: 'bar',
+            data: {
+                labels: cashierStats.map(c => c.cashier__username),
+                datasets: [{
+                    label: "Umumiy tushum",
+                    data: cashierStats.map(c => c.total),
+                    backgroundColor: "rgba(59,130,246,0.7)"
+                }]
+            }
+        });
+    </script>
+{% endblock %}
