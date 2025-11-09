@@ -28,7 +28,7 @@
             transition: all 0.4s ease-in-out;
         }
 
-        /* --- Mobilga moslashuv qo'shimchasi --- */
+        /* --- Mobilga moslashuv qo'shimchasi (Faol) --- */
         /* Telefon ekranida (640px dan kichik) sidebar default holatda yashirinadi */
         @media (max-width: 639px) {
             #sidebar {
@@ -36,15 +36,15 @@
                 position: fixed; /* Kontentni ustiga chiqish uchun */
                 z-index: 50; /* Eng ustida turishi uchun */
                 height: 100vh; /* To'liq ekran balandligi */
-                /* width: 0; endi JavaScript orqali boshqariladi */
+                width: 256px; /* Kichik ekran uchun kenglikni aniqlash */
             }
 
             /* Sidebar ochilganda */
             #sidebar.open {
-                transform: translateX(0);
+                transform: translateX(0); /* Ko'rsatish */
             }
 
-            /* Asosiy kontent o'ng tomonda turishi kerak, chunki sidebar fixed */
+            /* Main content ning paddingi faqat desktop uchun ishlaydi, mobil uchun 0 qolishi kerak */
             #main-content {
                 padding-left: 0;
                 padding-right: 0;
@@ -70,7 +70,8 @@
             <i class="fas fa-bars text-xl"></i>
         </button>
         <span class="text-lg font-bold">DILYORBEK SAVDO</span>
-        <div></div> </div>
+        <div></div>
+    </div>
 </header>
 
 
@@ -154,40 +155,81 @@
 
 
 <script>
-    // Mobil Sidebar uchun funksiya
+    // Mobil Sidebar uchun funksiya: #sidebar ga 'open' klassini qo'shadi/olib tashlaydi
     function toggleMobileSidebar() {
         let sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('open');
     }
 
-    // Katta ekran Sidebar uchun funksiya
+    // Katta ekran Sidebar uchun funksiya: w-64/w-16 klasslarini almashtiradi
     function toggleDesktopSidebar() {
         let sidebar = document.getElementById('sidebar');
         let icon = document.getElementById('sidebar-icon');
 
-        // Agar mobil rejimda bo'lmasa ishlaydi
+        // Faqat katta ekranlar uchun ishlaydi
         if (window.innerWidth >= 640) {
+
+            // 1. sidebar-collapsed classini boshqarish (menu-text yashirilishi uchun)
             sidebar.classList.toggle('sidebar-collapsed');
 
-            if (sidebar.classList.contains('w-64')) {
+            // 2. Kenglikni boshqarish
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                // Qisqarish holati (W-16)
                 sidebar.classList.remove('w-64');
                 sidebar.classList.add('w-16');
                 icon.classList.remove('fa-angle-left');
                 icon.classList.add('fa-angle-right');
             } else {
+                // Kengayish holati (W-64)
                 sidebar.classList.remove('w-16');
                 sidebar.classList.add('w-64');
                 icon.classList.remove('fa-angle-right');
                 icon.classList.add('fa-angle-left');
             }
         } else {
-            // Mobil rejimda ishlamaydi, mobile funksiyani chaqirish kerak
+            // Agar tugma xato bilan mobil rejimda bosilsa, mobil funksiyani chaqiradi
             toggleMobileSidebar();
         }
     }
 
-    // Asl funksiyani o'zgartirish: Endi u faqat katta ekran uchun ishlaydi
-    const toggleSidebar = toggleDesktopSidebar;
+    // Noutbukda yuklanganda sidebar ochilgan (w-64) holatda turishini ta'minlash
+    window.onload = function() {
+        let sidebar = document.getElementById('sidebar');
+        // Agar sm (640px) dan katta bo'lsa va 'w-64' mavjud bo'lmasa qo'shish
+        if (window.innerWidth >= 640 && !sidebar.classList.contains('w-64')) {
+            sidebar.classList.add('w-64');
+        }
+    };
+
+    // ********* MOBIL REJIMDA YOPISH FUNKSIYASI *********
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+
+        // Main contentga bosish eshituvchisi (Listener)
+        mainContent.addEventListener('click', () => {
+            // Agar ekran mobil rejimda bo'lsa va sidebar ochiq bo'lsa
+            if (window.innerWidth < 640 && sidebar.classList.contains('open')) {
+                // Sidebar'ni yopish
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Sidebar ichidagi linkga bosilganda ham yopish.
+        sidebar.addEventListener('click', (e) => {
+            // Agar bosilgan element <A> tagi bo'lsa
+            if (e.target.closest('a')) {
+                // Bir oz kutib sidebar'ni yopish (Link o'tib ketishi uchun)
+                setTimeout(() => {
+                    if (window.innerWidth < 640 && sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                    }
+                }, 100);
+            }
+        });
+    });
+    // ***************************************************
+
 </script>
 
 <script src="//unpkg.com/alpinejs" defer></script>

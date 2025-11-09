@@ -17,7 +17,7 @@
 
         <!-- Sales List -->
         <div class="space-y-4">
-            {% for sale in page_obj %}
+            {% for sale in sales %}
                 <a href="{% url 'sale_history_detail' sale.id %}" class="block">
                     <div class="rounded-xl shadow-md p-5 flex justify-between items-center transition transform hover:scale-[1.01] bg-white">
                         <div>
@@ -45,10 +45,9 @@
 
         <!-- Pagination -->
         {% if page_obj.has_other_pages %}
-            <div class="flex justify-center mt-6 space-x-2">
+            <div class="flex justify-center mt-6 space-x-2 flex-wrap">
                 {% if page_obj.has_previous %}
-                    <a href="?page=
-                            {{ page_obj.previous_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
                        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">← Oldingi</a>
                 {% else %}
                     <span class="px-3 py-2 bg-gray-100 rounded text-gray-400 cursor-not-allowed">← Oldingi</span>
@@ -64,8 +63,7 @@
                 {% endfor %}
 
                 {% if page_obj.has_next %}
-                    <a href="?page=
-                            {{ page_obj.next_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
                        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">Keyingi →</a>
                 {% else %}
                     <span class="px-3 py-2 bg-gray-100 rounded text-gray-400 cursor-not-allowed">Keyingi →</span>

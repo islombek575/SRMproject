@@ -474,25 +474,31 @@
 </head>
 
 <body>
+<div id="success-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-sm transform transition-all">
+        <div class="text-center">
+            <div class="text-6xl text-green-500 mb-4">✅</div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2" id="modal-title">Savdo Yakunlandi!</h3>
+            <p class="text-gray-600 mb-6" id="modal-message">Barcha ma'lumotlar saqlandi.</p>
+            <div class="space-y-3">
+                <p class="text-lg font-semibold text-gray-800">Qaytim: <span id="modal-change"
+                                                                             class="text-green-600">0</span> so'm</p>
+                <a href="{% url 'sale_create' %}" id="new-sale-btn"
+                   class="w-full inline-flex justify-center rounded-lg border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none transition sm:text-sm">
+                    Yangi Savdo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="main-container">
     <div id="top-messages" class="message-container"></div>
 
     <header class="header">
         <div style="font-size: 1.5rem; font-weight: 700;">🛒 Savdo - POS Terminal</div>
         <div id="datetime" style="font-size: 0.9rem; opacity: 0.9;"></div>
-        <div class="flex items-center gap-4">
-        <span class="flex items-center gap-2">
-            <span class="text-lg">👤</span>
-            <span class="font-medium">{{ request.user.username }}</span>
-        </span>
-            <a href="{% url 'profile' %}"
-               class="px-3 py-2 bg-blue-700 hover:bg-blue-800 rounded-md transition-colors">
-                Profil
-            </a>
-        </div>
     </header>
-
-
 
     <form id="pos-form" method="POST" action="{% url 'sale_create' %}" class="content-wrapper">
         {% csrf_token %}
@@ -530,7 +536,6 @@
                         </thead>
                     </table>
                 </div>
-
                 <div class="table-body">
                     <table>
                         <tbody id="cart-body"></tbody>
@@ -600,7 +605,7 @@
                 <button type="button" class="keypad-btn" data-key="0">0</button>
                 <button type="button" class="keypad-btn" data-key=".">.</button>
 
-                <button id="submit-btn" type="submit" class="keypad-btn submit">✔️ Savdoni yakunlash</button>
+                <button id="submit-btn" type="submit" class="keypad-btn submit">✔ Savdoni yakunlash</button>
 
                 <button type="button" id="clear-cart-btn" class="keypad-btn clear">❌ Tozalash</button>
                 <a href="{% url 'dashboard' %}" id="cancel-sale-btn" class="keypad-btn cancel">🔄 Bekor qilish</a>
@@ -702,7 +707,7 @@
         updateChange(total, received);
 
         $('#submit-btn').prop('disabled', total === 0);
-        $('#submit-btn').text(total === 0 ? 'Savatcha bo‘sh' : '✔️ Savdoni yakunlash');
+        $('#submit-btn').text(total === 0 ? 'Savatcha bo‘sh' : '✔ Savdoni yakunlash');
     }
 
     function updateChange(total, received) {
@@ -780,7 +785,7 @@
                             <td style="width: 120px; text-align: right; color: #495057;">${formatMoney(item.price)}</td>
                             <td style="width: 120px; text-align: right; font-weight: 700; color: #10b981;"><span class="line-total">${formatMoney(lineTotal)}</span></td>
                             <td style="width: 50px; text-align: center;">
-                                <button type="button" class="remove-line remove-btn" data-idx="${i}">🗑</button>
+                                <button type="button" class="remove-line remove-btn" data-idx="${i}">🗑️</button>
                             </td>
                         </tr>
                     `;
@@ -969,6 +974,8 @@
 
         // SAVDONI YAKUNLASH VA TOZALASH
         $('#pos-form').on('submit', function (e) {
+            e.preventDefault();
+            const form = $(this);
             if (cart.length === 0) {
                 showTopMessage("❌ Savatcha bo‘sh. Mahsulot qo'shing!", 'error');
                 e.preventDefault();
@@ -979,6 +986,7 @@
             const received = parseFloat($('#received-amount').val().replace(/[^0-9.]/g, '')) || 0;
             const paymentType = $('#payment-type').val();
             const customerName = $('#customer-name').val().trim();
+
 
             if (paymentType === 'credit') {
                 if (customerName.length < 3) {
@@ -995,8 +1003,69 @@
 
             $('#cart-data-input').val(JSON.stringify(cart));
 
-            // SAVDO MUVAFFFAQIYATLI YAKUNLANGANDAN KEYIN TOZALASH
+            const formData = new FormData(form[0]);
+
+            $.ajax({
+                type: form.attr('method'),
+                url: form.attr('action'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    // Agar serverdan "success: true" kelsa
+                    if (response.success) {
+                        let change = received - total;
+                        let message = "";
+                        let changeText = "";
+                        let changeColor = "#10b981"; // Yashil
+
+                        if (paymentType === 'credit') {
+                            changeText = `Qarz: ${formatMoney(Math.abs(change))} so'm`;
+                            message = `Nasiya (Qarz) savdosi muvaffaqiyatli yakunlandi.`;
+                            changeColor = "#e53e3e"; // Qizil
+                        } else if (change >= 0) {
+                            changeText = `${formatMoney(change)} so'm`;
+                            message = `Savdo muvaffaqiyatli yakunlandi.`;
+                        } else {
+                            changeText = `Yetmaydi: ${formatMoney(Math.abs(change))} so'm`;
+                            changeColor = "#e53e3e"; // Qizil
+                        }
+
+                        // 1. Modaldagi elementlarni yangilash
+                        $('#modal-title').text('Savdo Yakunlandi! 🎉');
+                        $('#modal-message').text(message);
+                        $('#modal-change').text(changeText).css('color', changeColor);
+
+                        // 2. Savatchani tozalash
+                        sessionStorage.removeItem('cart');
+                        cart = []; // Global cart massivini ham tozalash
+
+                        // 3. Modalik oynani ko'rsatish
+                        $('#success-modal').removeClass('hidden');
+
+                        // 4. POS interfeysini tozalash (yangi savdoga tayyorlash)
+                        // renderCart() updateTotals va boshqa logikani o'z ichiga oladi
+                        renderCart();
+                        $('#received-amount').val('0');
+                        $('#payment-type').val('cash').trigger('change');
+                        $('#customer-name').val('');
+
+
+                    } else {
+                        showTopMessage(response.message || 'Serverda xatolik yuz berdi!', 'error');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    showTopMessage('Server bilan aloqa xatosi: ' + xhr.status, 'error');
+                }
+            });
+        });
+
+        // Modalni yopish va yangi savdoga o'tish logikasi
+        $('#new-sale-btn').on('click', function (e) {
+            // Agar button href bilan ishlasa, shu kod kerak emas, lekin xavfsizlik uchun qo'shdik:
             sessionStorage.removeItem('cart');
+            $('#success-modal').addClass('hidden');
         });
 
         $('#cancel-sale-btn').on('click', function () {
@@ -1010,18 +1079,13 @@
             showTopMessage("Savatcha tozalandi!", 'warning');
         });
 
-        // BOSHQA PAGEGA O'TIB KETSA HAM TOZALASH
-        window.addEventListener('unload', function () {
-            sessionStorage.removeItem('cart');
-        });
 
-        // Avtofokusni ta'minlash
         $(document).on('click', function (e) {
-            // Agar bosilgan joy input, select, yoki klaviatura buttoni bo'lmasa, barcode inputga focus berish
             if (!$(e.target).closest('.keypad-btn, input, select').length) {
                 $('#barcode-input').focus();
             }
         });
+
     });
 </script>
 </body>

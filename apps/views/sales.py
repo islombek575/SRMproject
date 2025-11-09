@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, CreateView
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
@@ -35,8 +35,9 @@ class GetProductView(RoleRequiredMixin, LoginRequiredMixin, View):
             return JsonResponse({"success": False, "message": "❌ Mahsulot topilmadi!"})
 
 
-class SaleCreateView(RoleRequiredMixin, LoginRequiredMixin, View):
+class SaleCreateView(RoleRequiredMixin, LoginRequiredMixin, CreateView):
     allowed_roles = ['admin', 'cashier']
+    success_url = 'dashboard'
 
     def _redirect_by_role(self, request):
         if request.user.role == "admin":

@@ -1,6 +1,5 @@
 import uuid
 
-from apps.models import Product
 from django.db.models import (
     CASCADE,
     CharField,
@@ -11,6 +10,8 @@ from django.db.models import (
     PositiveIntegerField,
     UUIDField,
 )
+
+from apps.models import Product
 
 
 class Purchase(Model):
@@ -37,6 +38,11 @@ class PurchaseItem(Model):
     @property
     def total_price(self):
         return self.quantity * self.cost_price
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.product.increase_stock(self.quantity)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"

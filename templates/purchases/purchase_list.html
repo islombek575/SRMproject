@@ -3,77 +3,79 @@
 {% block content %}
     <div class="container mx-auto p-4 bg-gray-100 min-h-screen">
 
-        <!-- Sarlavha -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
             <h1 class="text-3xl font-bold text-gray-800">Xaridlar</h1>
-            <div class="text-lg font-semibold text-gray-700">
+            <div class="text-lg font-semibold text-gray-700 whitespace-nowrap">
                 Umumiy xarajat: <span class="text-green-600">{{ total_sales|floatformat:0|intcomma }} UZS</span>
             </div>
         </div>
 
-        <!-- Filter & Add -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-            <form method="get" class="flex flex-wrap items-center gap-2">
-                <label for="date" class="font-medium">Sana bo‘yicha filter:</label>
-                <input type="date" id="date" name="date" value="{{ selected_date }}" class="border rounded px-2 py-1">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+            <form method="get" class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <label for="date" class="font-medium whitespace-nowrap">Sana bo‘yicha filter:</label>
+                <input type="date" id="date" name="date" value="{{ selected_date }}"
+                       class="border rounded px-2 py-1 w-full sm:w-auto">
+                <button type="submit"
+                        class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition w-1/2 sm:w-auto">
                     Filtrlash
                 </button>
-                <a href="{% url 'purchase_list' %}" class="ml-2 text-gray-600 hover:underline">Tozalash</a>
+                <a href="{% url 'purchase_list' %}" class="text-gray-600 hover:underline w-1/2 sm:w-auto text-center">Tozalash</a>
             </form>
 
             <a href="{% url 'add_purchase' %}"
-               class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+               class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition w-full sm:w-auto text-center">
                 ➕ Xarid qo‘shish
             </a>
         </div>
 
-        <!-- Purchases Table -->
         <div class="overflow-x-auto bg-white rounded shadow">
-            <table class="min-w-full">
+            <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-200">
                 <tr>
-                    <th class="px-4 py-2 text-left">#</th>
-                    <th class="px-4 py-2 text-left">Xarid ID</th>
-                    <th class="px-4 py-2 text-left">Umumiy summa</th>
-                    <th class="px-4 py-2 text-left">Sana</th>
-                    <th class="px-4 py-2 text-left">Holat</th>
-                    <th class="px-4 py-2 text-center">Amallar</th>
+                    <th class="px-4 py-2 text-left whitespace-nowrap">#</th>
+                    <th class="px-4 py-2 text-left whitespace-nowrap">Xarid ID</th>
+                    <th class="px-4 py-2 text-left whitespace-nowrap">Umumiy summa</th>
+                    <th class="px-4 py-2 text-left whitespace-nowrap">Sana</th>
+                    <th class="px-4 py-2 text-left whitespace-nowrap">Holat</th>
+                    <th class="px-4 py-2 text-center whitespace-nowrap">Amallar</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for purchase in purchases %}
                     <tr class="border-b hover:bg-gray-50 transition">
-                        <td class="px-4 py-2">{{ forloop.counter }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap">{{ forloop.counter }}</td>
                         <td onclick="window.location.href='{% url 'purchase_detail' purchase.id %}'"
-                            class="px-4 py-2 text-blue-600 font-semibold cursor-pointer">
+                            class="px-4 py-2 text-blue-600 font-semibold cursor-pointer whitespace-nowrap">
                             {{ purchase.id }}
                         </td>
-                        <td class="px-4 py-2">{{ purchase.total_price|floatformat:0|intcomma }} UZS</td>
-                        <td class="px-4 py-2">{{ purchase.purchased_at|date:"d-m-Y H:i" }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap">{{ purchase.total_price|floatformat:0|intcomma }} UZS
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap">{{ purchase.purchased_at|date:"d-m-Y H:i" }}</td>
                         <td class="px-4 py-2">
                             {% if purchase.status == "PENDING" %}
-                                <span class="inline-block px-3 py-1 text-sm font-medium text-yellow-800 bg-yellow-200 rounded-full">Kutilmoqda</span>
+                                <span class="inline-block px-3 py-1 text-sm font-medium text-yellow-800 bg-yellow-200 rounded-full whitespace-nowrap">Kutilmoqda</span>
                             {% elif purchase.status == "COMPLETED" %}
-                                <span class="inline-block px-3 py-1 text-sm font-medium text-green-800 bg-green-200 rounded-full">Yakunlangan</span>
+                                <span class="inline-block px-3 py-1 text-sm font-medium text-green-800 bg-green-200 rounded-full whitespace-nowrap">Yakunlangan</span>
                             {% else %}
-                                <span class="inline-block px-3 py-1 text-sm font-medium text-red-800 bg-red-200 rounded-full">Bekor qilingan</span>
+                                <span class="inline-block px-3 py-1 text-sm font-medium text-red-800 bg-red-200 rounded-full whitespace-nowrap">Bekor qilingan</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-2 text-center space-x-2">
+                        <td class="px-4 py-2 text-center flex flex-col sm:flex-row justify-center gap-2">
                             {% if purchase.status == "PENDING" %}
-                                <form method="post" action="{% url 'purchase_complete' purchase.id %}" class="inline">
+                                <form method="post" action="{% url 'purchase_complete' purchase.id %}"
+                                      class="inline w-full sm:w-auto">
                                     {% csrf_token %}
                                     <button type="submit"
-                                            class="inline-block px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition">
+                                            class="inline-block px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition w-full">
                                         ✅ Yakunlash
                                     </button>
                                 </form>
 
-                                <form method="post" action="{% url 'purchase_cancel' purchase.id %}" class="inline">
+                                <form method="post" action="{% url 'purchase_cancel' purchase.id %}"
+                                      class="inline w-full sm:w-auto">
                                     {% csrf_token %}
                                     <button type="submit"
-                                            class="inline-block px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                                            class="inline-block px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition w-full">
                                         ❌ Bekor qilish
                                     </button>
                                 </form>
@@ -91,4 +93,30 @@
             </table>
         </div>
     </div>
+    {% if page_obj.has_other_pages %}
+        <div class="flex justify-center mt-6 space-x-2 flex-wrap">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                   class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">← Oldingi</a>
+            {% else %}
+                <span class="px-3 py-2 bg-gray-100 rounded text-gray-400 cursor-not-allowed">← Oldingi</span>
+            {% endif %}
+
+            {% for page_num in page_obj.paginator.page_range %}
+                {% if page_num == page_obj.number %}
+                    <span class="px-3 py-2 bg-indigo-500 text-white rounded">{{ page_num }}</span>
+                {% elif page_num > page_obj.number|add:-3 and page_num < page_obj.number|add:3 %}
+                    <a href="?page={{ page_num }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                       class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{{ page_num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                   class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">Keyingi →</a>
+            {% else %}
+                <span class="px-3 py-2 bg-gray-100 rounded text-gray-400 cursor-not-allowed">Keyingi →</span>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}

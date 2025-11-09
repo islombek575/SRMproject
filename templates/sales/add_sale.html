@@ -474,6 +474,25 @@
     </head>
 
     <body>
+    <div id="success-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-sm transform transition-all">
+            <div class="text-center">
+                <div class="text-6xl text-green-500 mb-4">✅</div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2" id="modal-title">Savdo Yakunlandi!</h3>
+                <p class="text-gray-600 mb-6" id="modal-message">Barcha ma'lumotlar saqlandi.</p>
+                <div class="space-y-3">
+                    <p class="text-lg font-semibold text-gray-800">Qaytim: <span id="modal-change" class="text-green-600">0</span> so'm</p>
+                    <a href="{% url 'sale_create' %}" id="new-sale-btn" class="w-full inline-flex justify-center rounded-lg border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none transition sm:text-sm">
+                        Yangi Savdo
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="w-full inline-flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none transition sm:text-sm">
+                        Asosiy Sahifa
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="main-container">
         <div id="top-messages" class="message-container"></div>
 
@@ -997,16 +1016,41 @@
                         // Agar serverdan "success: true" kelsa
                         if (response.success) {
                             let change = received - total;
-                            let message = "Savdo muvaffaqiyatli yakunlandi!";
+                            let message = "";
+                            let changeText = "";
+                            let changeColor = "#10b981"; // Yashil
 
                             if (paymentType === 'credit') {
-                                message += ` Qarz: ${formatMoney(Math.abs(change))}`;
-                            } else if (change > 0) {
-                                message += ` Qaytim: ${formatMoney(change)}`;
+                                changeText = `Qarz: ${formatMoney(Math.abs(change))} so'm`;
+                                message = `Nasiya (Qarz) savdosi muvaffaqiyatli yakunlandi.`;
+                                changeColor = "#e53e3e"; // Qizil
+                            } else if (change >= 0) {
+                                changeText = `${formatMoney(change)} so'm`;
+                                message = `Savdo muvaffaqiyatli yakunlandi.`;
+                            } else {
+                                changeText = `Yetmaydi: ${formatMoney(Math.abs(change))} so'm`;
+                                changeColor = "#e53e3e"; // Qizil
                             }
-                            showTopMessage(message, 'success');
 
+                            // 1. Modaldagi elementlarni yangilash
+                            $('#modal-title').text('Savdo Yakunlandi! 🎉');
+                            $('#modal-message').text(message);
+                            $('#modal-change').text(changeText).css('color', changeColor);
+
+                            // 2. Savatchani tozalash
                             sessionStorage.removeItem('cart');
+                            cart = []; // Global cart massivini ham tozalash
+
+                            // 3. Modalik oynani ko'rsatish
+                            $('#success-modal').removeClass('hidden');
+
+                            // 4. POS interfeysini tozalash (yangi savdoga tayyorlash)
+                            // renderCart() updateTotals va boshqa logikani o'z ichiga oladi
+                            renderCart();
+                            $('#received-amount').val('0');
+                            $('#payment-type').val('cash').trigger('change');
+                            $('#customer-name').val('');
+
 
                         } else {
                             showTopMessage(response.message || 'Serverda xatolik yuz berdi!', 'error');
@@ -1016,6 +1060,13 @@
                         showTopMessage('Server bilan aloqa xatosi: ' + xhr.status, 'error');
                     }
                 });
+            });
+
+            // Modalni yopish va yangi savdoga o'tish logikasi
+            $('#new-sale-btn').on('click', function (e) {
+                // Agar button href bilan ishlasa, shu kod kerak emas, lekin xavfsizlik uchun qo'shdik:
+                sessionStorage.removeItem('cart');
+                $('#success-modal').addClass('hidden');
             });
 
             $('#cancel-sale-btn').on('click', function () {
@@ -1030,9 +1081,7 @@
             });
 
             // BOSHQA PAGEGA O'TIB KETSA HAM TOZALASH
-            window.addEventListener('unload', function () {
-                sessionStorage.removeItem('cart');
-            });
+            // Bu yerda o'zgartirish shart emas.
 
             // Avtofokusni ta'minlash
             $(document).on('click', function (e) {

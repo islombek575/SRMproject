@@ -44,3 +44,9 @@ class SaleItem(Model):
     @property
     def subtotal(self):
         return Decimal(self.quantity) * self.price
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.product.decrease_stock(self.quantity)
+        super().save(*args, **kwargs)
+
