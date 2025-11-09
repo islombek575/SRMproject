@@ -1,6 +1,7 @@
 import uuid
 from decimal import Decimal
 
+from apps.models import Customer, Product
 from django.conf import settings
 from django.db.models import (
     CASCADE,
@@ -14,8 +15,6 @@ from django.db.models import (
     UUIDField,
 )
 from django.db.models.enums import TextChoices
-
-from apps.models import Customer, Product
 
 User = settings.AUTH_USER_MODEL
 

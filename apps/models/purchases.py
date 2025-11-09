@@ -10,7 +10,8 @@ from django.db.models import (
     ForeignKey,
     Model,
     PositiveIntegerField,
-    UUIDField, TextChoices,
+    TextChoices,
+    UUIDField,
 )
 
 
