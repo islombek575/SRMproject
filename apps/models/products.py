@@ -1,7 +1,7 @@
 import uuid
 from decimal import Decimal
 
-from django.db.models import CharField, DateTimeField, DecimalField, Model, UUIDField, TextChoices
+from django.db.models import CharField, DateTimeField, DecimalField, Model, TextChoices, UUIDField
 
 
 class Product(Model):
@@ -40,5 +40,3 @@ class Product(Model):
     def increase_stock(self, quantity):
         self.stock += Decimal(quantity)
         self.save(update_fields=['stock'])
-
-

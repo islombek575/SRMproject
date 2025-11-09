@@ -1,8 +1,6 @@
 import json
 from decimal import Decimal as Dec
 
-from apps.mixins import RoleRequiredMixin
-from apps.models import Customer, Debt, Product, Sale, SaleItem
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
@@ -10,10 +8,13 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
-from django.views.generic import DetailView, ListView, CreateView
+from django.views.generic import CreateView, DetailView, ListView
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
+
+from apps.mixins import RoleRequiredMixin
+from apps.models import Customer, Debt, Product, Sale, SaleItem
 
 
 class GetProductView(RoleRequiredMixin, LoginRequiredMixin, View):

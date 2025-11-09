@@ -9,6 +9,9 @@ class User(AbstractUser):
     )
     role = CharField(max_length=20, choices=ROLE_CHOICES, default='cashier')
 
-    @property
     def is_cashier(self):
         return self.role == 'cashier'
+
+    def is_admin(self):
+        return self.role == 'admin'
+

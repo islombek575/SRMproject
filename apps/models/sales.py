@@ -1,7 +1,6 @@
 import uuid
 from decimal import Decimal
 
-from apps.models import Customer, Product
 from django.conf import settings
 from django.db.models import (
     CASCADE,
@@ -16,7 +15,10 @@ from django.db.models import (
 )
 from django.db.models.enums import TextChoices
 
+from apps.models import Customer, Product
+
 User = settings.AUTH_USER_MODEL
+
 
 class Sale(Model):
     class PAYMENT(TextChoices):
@@ -25,28 +27,30 @@ class Sale(Model):
         CREDIT = 'credit', 'Nasiya'
 
     id = UUIDField(default=uuid.uuid4, editable=False, primary_key=True, unique=True)
-    customer = ForeignKey(Customer, on_delete=SET_NULL, null=True, blank=True)
-    cashier = ForeignKey(User, on_delete=SET_NULL, null=True, blank=True)
+    customer = ForeignKey('apps.Customer', on_delete=SET_NULL, null=True, blank=True)
+    cashier = ForeignKey('apps.User', on_delete=SET_NULL, null=True, blank=True)
     payment_type = CharField(max_length=10, choices=PAYMENT.choices, default=PAYMENT.CASH)
     total_amount = DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     paid_amount = DecimalField(max_digits=12, decimal_places=2, default=0)
     created_at = DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Sale #{self.id} - {self.total_amount}"
+        return f"Sale #{self.id} - Total: {self.total_amount}, Remaining: {self.total_amount - self.paid_amount}"
+
+
 
 class SaleItem(Model):
-    sale = ForeignKey(Sale, on_delete=CASCADE, related_name='items')
-    product = ForeignKey(Product, on_delete=SET_NULL, null=True)
-    quantity = PositiveIntegerField()
+    sale = ForeignKey('apps.Sale', on_delete=CASCADE, related_name='items')
+    product = ForeignKey('apps.Product', on_delete=SET_NULL, null=True)
+    quantity = DecimalField(max_digits=10, decimal_places=2)
     price = DecimalField(max_digits=12, decimal_places=2)
 
     @property
     def subtotal(self):
-        return Decimal(self.quantity) * self.price
+        return (self.quantity * self.price).quantize(Decimal("0.01"))
+
 
     def save(self, *args, **kwargs):
         if not self.pk:
             self.product.decrease_stock(self.quantity)
         super().save(*args, **kwargs)
-
