@@ -17,60 +17,67 @@
 
         <!-- Sales List -->
         <div class="space-y-4">
-            {% for sale in sales %}
+            {% for sale in page_obj %}
                 <a href="{% url 'sale_history_detail' sale.id %}" class="block">
-                    <div class="rounded-xl shadow-md p-5 flex justify-between items-center transition transform hover:scale-[1.01] bg-white"
-                    {% cycle 'from-pink-100 to-pink-200'
-                    'from-green-100 to-green-200'
-                    'from-blue-100 to-blue-200'
-                    'from-purple-100 to-purple-200'
-                    'from-yellow-100 to-yellow-200' %}">
-                    <div>
-                        <p class="text-sm text-gray-600">{{ sale.created_at|date:"Y-m-d H:i" }}</p>
-                        <p class="text-lg font-semibold text-gray-900">Mijoz: {{ sale.customer.name }}</p>
-                        <p class="text-gray-700">Sotuvchi: {{ sale.cashier.username }}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xl font-bold text-gray-900">{{ sale.total_amount }} so‘m</p>
-                        <span class="text-sm px-3 py-1 rounded-full
-                                 {% if sale.payment_type == 'cash' %} bg-green-200 text-green-800
-                                 {% elif sale.payment_type == 'card' %} bg-blue-200 text-blue-800
-                                 {% else %} bg-yellow-200 text-yellow-800
-                                 {% endif %}">
+                    <div class="rounded-xl shadow-md p-5 flex justify-between items-center transition transform hover:scale-[1.01] bg-white">
+                        <div>
+                            <p class="text-sm text-gray-600">{{ sale.created_at|date:"Y-m-d H:i" }}</p>
+                            <p class="text-lg font-semibold text-gray-900">Mijoz: {{ sale.customer.name }}</p>
+                            <p class="text-gray-700">Sotuvchi: {{ sale.cashier.username }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xl font-bold text-gray-900">{{ sale.total_amount }} so‘m</p>
+                            <span class="text-sm px-3 py-1 rounded-full
+                        {% if sale.payment_type == 'cash' %} bg-green-200 text-green-800
+                        {% elif sale.payment_type == 'card' %} bg-blue-200 text-blue-800
+                        {% else %} bg-yellow-200 text-yellow-800
+                        {% endif %}">
                         {{ sale.get_payment_type_display }}
                     </span>
+                        </div>
                     </div>
-                </div>
                 </a>
             {% empty %}
                 <p class="text-center text-gray-500">Hali hech qanday savdo yo‘q.</p>
             {% endfor %}
-    </div>
+        </div>
 
-    <!-- Pagination -->
-    <div class="flex justify-center mt-6 space-x-2">
-        {% if sales.has_previous %}
-            <a href="?page=
-                    {{ sales.previous_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
-               class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">← Oldingi</a>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+            <div class="flex justify-center mt-6 space-x-2">
+                {% if page_obj.has_previous %}
+                    <a href="?page=
+                            {{ page_obj.previous_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                       class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">← Oldingi</a>
+                {% else %}
+                    <span class="px-3 py-2 bg-gray-100 rounded text-gray-400 cursor-not-allowed">← Oldingi</span>
+                {% endif %}
+
+                {% for page_num in page_obj.paginator.page_range %}
+                    {% if page_num == page_obj.number %}
+                        <span class="px-3 py-2 bg-indigo-500 text-white rounded">{{ page_num }}</span>
+                    {% elif page_num > page_obj.number|add:-3 and page_num < page_obj.number|add:3 %}
+                        <a href="?page={{ page_num }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                           class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{{ page_num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page=
+                            {{ page_obj.next_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                       class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">Keyingi →</a>
+                {% else %}
+                    <span class="px-3 py-2 bg-gray-100 rounded text-gray-400 cursor-not-allowed">Keyingi →</span>
+                {% endif %}
+            </div>
         {% endif %}
-
-        <span class="px-4 py-2 bg-gray-100 rounded shadow">
-            Sahifa {{ sales.number }} / {{ sales.paginator.num_pages }}
-        </span>
-
-        {% if sales.has_next %}
-            <a href="?page={{ sales.next_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
-               class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">Keyingi →</a>
-        {% endif %}
-    </div>
     </div>
 
     <script>
         document.getElementById('clear-filters').addEventListener('click', function () {
-            const form = this.closest('form');
-            form.querySelectorAll('input').forEach(input => input.value = '');
-            form.submit();
+            document.querySelector('input[name="date"]').value = '';
+            this.closest('form').submit();
         });
     </script>
 {% endblock %}

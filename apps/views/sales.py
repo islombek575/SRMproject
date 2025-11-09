@@ -144,7 +144,7 @@ class SaleHistoryView(RoleRequiredMixin, LoginRequiredMixin, ListView):
     model = Sale
     template_name = "sales/sale_history.html"
     context_object_name = 'sales'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         filter_date = self.request.GET.get("date")
