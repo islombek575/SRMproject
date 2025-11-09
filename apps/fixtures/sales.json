@@ -1,0 +1,266 @@
+[
+{
+  "model": "apps.sale",
+  "pk": "090e8404-6e65-4cf9-9156-06b263569b63",
+  "fields": {
+    "customer": 1,
+    "cashier": 2,
+    "payment_type": "credit",
+    "total_amount": "30000.00",
+    "paid_amount": "0.00",
+    "created_at": "2025-10-22T09:19:51.254Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "0e4c42dd-4c4c-40b4-a700-59bb504ac29b",
+  "fields": {
+    "customer": null,
+    "cashier": 1,
+    "payment_type": "cash",
+    "total_amount": "30000.00",
+    "paid_amount": "0.00",
+    "created_at": "2025-10-22T09:19:26.613Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "1b80d9be-c0da-48ad-b9eb-e8015e38b671",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "3000.00",
+    "paid_amount": "3000.00",
+    "created_at": "2025-11-05T06:05:43.191Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "20a24146-261f-4a81-995e-01834f562cbb",
+  "fields": {
+    "customer": 1,
+    "cashier": 1,
+    "payment_type": "credit",
+    "total_amount": "30000.00",
+    "paid_amount": "5000.00",
+    "created_at": "2025-10-28T13:16:10.720Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "24ee6500-ddc1-469d-921b-02bed211548e",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "15000.00",
+    "paid_amount": "15000.00",
+    "created_at": "2025-10-30T12:42:03.245Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "25ba4ae6-0056-4487-aea9-d950378538ee",
+  "fields": {
+    "customer": null,
+    "cashier": 1,
+    "payment_type": "cash",
+    "total_amount": "30000.00",
+    "paid_amount": "30000.00",
+    "created_at": "2025-10-22T13:03:56.858Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "30aefc5c-b5da-4158-af18-3e3d3f824e8b",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "10000.00",
+    "paid_amount": "10000.00",
+    "created_at": "2025-10-30T12:48:49.152Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "331599a9-48e9-43be-9caa-d65d6709c8dc",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "5000.00",
+    "paid_amount": "5000.00",
+    "created_at": "2025-10-30T12:46:42.128Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "344c766e-47a4-49e1-a62f-b591cf1f89d4",
+  "fields": {
+    "customer": 1,
+    "cashier": 1,
+    "payment_type": "credit",
+    "total_amount": "15000.00",
+    "paid_amount": "10000.00",
+    "created_at": "2025-10-28T13:40:22.116Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "430aad3f-6ee2-4367-96be-24ba05913013",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "15000.00",
+    "paid_amount": "15000.00",
+    "created_at": "2025-10-30T12:26:30.554Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "4b550349-3464-4fe5-9e48-8bee45806d50",
+  "fields": {
+    "customer": 3,
+    "cashier": 1,
+    "payment_type": "credit",
+    "total_amount": "60000.00",
+    "paid_amount": "0.00",
+    "created_at": "2025-10-29T15:30:18.254Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "5d66ff0f-9b03-4d11-b7d1-112f572cc1ac",
+  "fields": {
+    "customer": null,
+    "cashier": 1,
+    "payment_type": "cash",
+    "total_amount": "15000.00",
+    "paid_amount": "15000.00",
+    "created_at": "2025-11-09T14:14:12.652Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "71b66a36-5b2c-4de5-9051-db837c3deefd",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "5000.00",
+    "paid_amount": "5000.00",
+    "created_at": "2025-10-30T12:44:31.804Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "8374f562-ccda-4377-9ccf-12851ab7c911",
+  "fields": {
+    "customer": null,
+    "cashier": 1,
+    "payment_type": "cash",
+    "total_amount": "85000.00",
+    "paid_amount": "100000.00",
+    "created_at": "2025-10-29T16:12:28.490Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "9ee1260b-09e5-46fd-a4ac-f5dcebb9c597",
+  "fields": {
+    "customer": null,
+    "cashier": 1,
+    "payment_type": "card",
+    "total_amount": "15000.00",
+    "paid_amount": "15000.00",
+    "created_at": "2025-10-29T15:10:37.424Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "abd83749-c133-49e8-acec-07a9a125c588",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "15000.00",
+    "paid_amount": "15000.00",
+    "created_at": "2025-10-30T12:35:33.659Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "d6085a74-fca7-4b35-9402-a804ae3bf803",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "35000.00",
+    "paid_amount": "35000.00",
+    "created_at": "2025-10-30T12:26:08.765Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "db8d7b17-327b-450c-9fb2-c932e75a571b",
+  "fields": {
+    "customer": null,
+    "cashier": 1,
+    "payment_type": "cash",
+    "total_amount": "15000.00",
+    "paid_amount": "15000.00",
+    "created_at": "2025-10-28T13:35:12.995Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "dc809b60-9d80-4e3c-a30f-79af94100185",
+  "fields": {
+    "customer": 2,
+    "cashier": 1,
+    "payment_type": "credit",
+    "total_amount": "45000.00",
+    "paid_amount": "0.00",
+    "created_at": "2025-10-28T13:58:02.758Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "ed73d95c-52ad-4a0b-9a7a-8ede716ce5bb",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "7000.00",
+    "paid_amount": "7000.00",
+    "created_at": "2025-10-30T12:54:52.978Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "efa265f5-248d-47bd-9bfd-547a0ebd8098",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "cash",
+    "total_amount": "10000.00",
+    "paid_amount": "10000.00",
+    "created_at": "2025-10-30T12:48:17.814Z"
+  }
+},
+{
+  "model": "apps.sale",
+  "pk": "f84ef22b-9c1c-4df8-92b0-8382ca7e4f5d",
+  "fields": {
+    "customer": null,
+    "cashier": 2,
+    "payment_type": "card",
+    "total_amount": "3000.00",
+    "paid_amount": "3000.00",
+    "created_at": "2025-10-30T12:57:45.635Z"
+  }
+}
+]

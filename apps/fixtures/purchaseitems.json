@@ -1,0 +1,72 @@
+[
+{
+  "model": "apps.purchaseitem",
+  "pk": 1,
+  "fields": {
+    "purchase": "10508f6d-f504-42fa-9e88-30750ae217e5",
+    "product": "4be2488b-adaa-4c93-a5a6-235385c3f262",
+    "quantity": 10,
+    "cost_price": "14000.00"
+  }
+},
+{
+  "model": "apps.purchaseitem",
+  "pk": 2,
+  "fields": {
+    "purchase": "43c28ad4-7f5b-4077-bcd3-527da171a1e8",
+    "product": "fb7f3d88-8c12-469e-b8dc-dbfc8ae9226f",
+    "quantity": 10,
+    "cost_price": "14000.00"
+  }
+},
+{
+  "model": "apps.purchaseitem",
+  "pk": 3,
+  "fields": {
+    "purchase": "0f4c336b-e696-4bf2-866a-b4222c8820f4",
+    "product": "4be2488b-adaa-4c93-a5a6-235385c3f262",
+    "quantity": 10,
+    "cost_price": "14000.00"
+  }
+},
+{
+  "model": "apps.purchaseitem",
+  "pk": 4,
+  "fields": {
+    "purchase": "57414c1a-6a71-43c9-972f-3912cdaa3e65",
+    "product": "9694d9a9-cabc-4ff2-9a20-161039163c8e",
+    "quantity": 10,
+    "cost_price": "2000.00"
+  }
+},
+{
+  "model": "apps.purchaseitem",
+  "pk": 5,
+  "fields": {
+    "purchase": "57414c1a-6a71-43c9-972f-3912cdaa3e65",
+    "product": "e84c0938-5a3f-409c-8e02-fc0439361319",
+    "quantity": 10,
+    "cost_price": "9000.00"
+  }
+},
+{
+  "model": "apps.purchaseitem",
+  "pk": 6,
+  "fields": {
+    "purchase": "e1d0c670-df8c-415c-89dd-4386b1c11fb1",
+    "product": "1b6d9788-c422-42d2-a61b-3ddfe4b6b8ea",
+    "quantity": 5,
+    "cost_price": "9000.00"
+  }
+},
+{
+  "model": "apps.purchaseitem",
+  "pk": 7,
+  "fields": {
+    "purchase": "720f8d12-b391-43a3-bdf2-ffc482bea4bc",
+    "product": "1b6d9788-c422-42d2-a61b-3ddfe4b6b8ea",
+    "quantity": 5,
+    "cost_price": "9000.00"
+  }
+}
+]

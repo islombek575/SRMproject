@@ -1,0 +1,198 @@
+[
+{
+  "model": "apps.product",
+  "pk": "1b6d9788-c422-42d2-a61b-3ddfe4b6b8ea",
+  "fields": {
+    "name": "Coca Cola 1 l",
+    "barcode": "11223222",
+    "cost_price": "9000.00",
+    "sell_price": "10000.00",
+    "unit": "piece",
+    "stock": "23.0",
+    "created_at": "2025-10-29T16:06:17.806Z",
+    "updated_at": "2025-11-09T13:29:24.749Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "3d5ac032-769c-4495-801e-5648623a8c0b",
+  "fields": {
+    "name": "Mors 2 l",
+    "barcode": "983443423",
+    "cost_price": "4000.00",
+    "sell_price": "5000.00",
+    "unit": "piece",
+    "stock": "19.0",
+    "created_at": "2025-10-29T16:03:12.158Z",
+    "updated_at": "2025-10-29T16:12:28.528Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "4b9b4a5f-b8bc-4f52-99b2-d41e9d2d0cf8",
+  "fields": {
+    "name": "Hydrolife 1,5 l",
+    "barcode": "46204837",
+    "cost_price": "4000.00",
+    "sell_price": "5000.00",
+    "unit": "piece",
+    "stock": "18.0",
+    "created_at": "2025-10-29T15:59:58.358Z",
+    "updated_at": "2025-10-30T12:46:42.171Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "4be2488b-adaa-4c93-a5a6-235385c3f262",
+  "fields": {
+    "name": "Fanta 1,5 l",
+    "barcode": "67545643",
+    "cost_price": "14000.00",
+    "sell_price": "15000.00",
+    "unit": "piece",
+    "stock": "19.0",
+    "created_at": "2025-10-22T09:08:34.149Z",
+    "updated_at": "2025-10-29T16:12:28.535Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "8ab17a36-e976-481e-b47e-995b6cb87cbc",
+  "fields": {
+    "name": "Pepsi 0,5 l",
+    "barcode": "4433733",
+    "cost_price": "6000.00",
+    "sell_price": "7000.00",
+    "unit": "piece",
+    "stock": "19.0",
+    "created_at": "2025-10-29T16:07:18.537Z",
+    "updated_at": "2025-10-30T12:26:08.848Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "92d7ab6d-982d-40c9-ba44-1a511badb464",
+  "fields": {
+    "name": "Fanta 0,5 l",
+    "barcode": "00083783",
+    "cost_price": "6000.00",
+    "sell_price": "7000.00",
+    "unit": "piece",
+    "stock": "18.0",
+    "created_at": "2025-10-29T16:05:45.317Z",
+    "updated_at": "2025-10-30T12:54:52.987Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "9622806a-9c95-4af5-9237-510546252d58",
+  "fields": {
+    "name": "Pepsi 1,5 l",
+    "barcode": "90543558",
+    "cost_price": "14000.00",
+    "sell_price": "15000.00",
+    "unit": "piece",
+    "stock": "18.0",
+    "created_at": "2025-10-29T15:59:26.998Z",
+    "updated_at": "2025-10-30T12:42:03.249Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "9694d9a9-cabc-4ff2-9a20-161039163c8e",
+  "fields": {
+    "name": "Hydrolife 1 l",
+    "barcode": "8765444",
+    "cost_price": "2000.00",
+    "sell_price": "3000.00",
+    "unit": "piece",
+    "stock": "28.0",
+    "created_at": "2025-10-29T16:00:22.652Z",
+    "updated_at": "2025-11-05T06:02:23.886Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "cdef48fe-21dc-406e-91c5-fd69534c2d2b",
+  "fields": {
+    "name": "Nescafe Gold",
+    "barcode": "123456789",
+    "cost_price": "24000.00",
+    "sell_price": "27000.00",
+    "unit": "piece",
+    "stock": "20.0",
+    "created_at": "2025-11-09T13:27:34.158Z",
+    "updated_at": "2025-11-09T13:27:34.158Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "cf9c44c9-a3cc-49a3-acc6-077120092537",
+  "fields": {
+    "name": "Coca Cola 0,5 l",
+    "barcode": "338832222",
+    "cost_price": "6000.00",
+    "sell_price": "7000.00",
+    "unit": "piece",
+    "stock": "19.0",
+    "created_at": "2025-10-29T16:08:26.661Z",
+    "updated_at": "2025-10-29T16:12:28.553Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "d56323f7-b152-40fb-aabf-419b82dc544f",
+  "fields": {
+    "name": "Pepsi 1 l",
+    "barcode": "886666666",
+    "cost_price": "9000.00",
+    "sell_price": "10000.00",
+    "unit": "piece",
+    "stock": "18.0",
+    "created_at": "2025-10-29T16:07:56.806Z",
+    "updated_at": "2025-10-30T12:48:49.165Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "e84c0938-5a3f-409c-8e02-fc0439361319",
+  "fields": {
+    "name": "Fanta 1 l",
+    "barcode": "00887353",
+    "cost_price": "9000.00",
+    "sell_price": "10000.00",
+    "unit": "piece",
+    "stock": "28.0",
+    "created_at": "2025-10-29T16:04:25.633Z",
+    "updated_at": "2025-11-05T06:02:23.890Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "f2004bc2-22f2-4c28-b931-3bcc56073cde",
+  "fields": {
+    "name": "Hydrolife 0,5 l",
+    "barcode": "233114544",
+    "cost_price": "2000.00",
+    "sell_price": "3000.00",
+    "unit": "piece",
+    "stock": "17.0",
+    "created_at": "2025-10-29T16:10:06.918Z",
+    "updated_at": "2025-11-05T06:05:43.198Z"
+  }
+},
+{
+  "model": "apps.product",
+  "pk": "fb7f3d88-8c12-469e-b8dc-dbfc8ae9226f",
+  "fields": {
+    "name": "Coca Cola 1,5 l",
+    "barcode": "5348587",
+    "cost_price": "14000.00",
+    "sell_price": "15000.00",
+    "unit": "piece",
+    "stock": "16.0",
+    "created_at": "2025-10-22T08:59:19.950Z",
+    "updated_at": "2025-11-09T14:14:12.662Z"
+  }
+}
+]

@@ -1,0 +1,56 @@
+[
+{
+  "model": "apps.purchase",
+  "pk": "0f4c336b-e696-4bf2-866a-b4222c8820f4",
+  "fields": {
+    "status": "CANCELLED",
+    "total_price": "140000.00",
+    "purchased_at": "2025-10-22T09:15:53.214Z"
+  }
+},
+{
+  "model": "apps.purchase",
+  "pk": "10508f6d-f504-42fa-9e88-30750ae217e5",
+  "fields": {
+    "status": "COMPLETED",
+    "total_price": "140000.00",
+    "purchased_at": "2025-10-22T09:09:59.395Z"
+  }
+},
+{
+  "model": "apps.purchase",
+  "pk": "43c28ad4-7f5b-4077-bcd3-527da171a1e8",
+  "fields": {
+    "status": "COMPLETED",
+    "total_price": "140000.00",
+    "purchased_at": "2025-10-22T09:15:29.176Z"
+  }
+},
+{
+  "model": "apps.purchase",
+  "pk": "57414c1a-6a71-43c9-972f-3912cdaa3e65",
+  "fields": {
+    "status": "COMPLETED",
+    "total_price": "110000.00",
+    "purchased_at": "2025-11-05T06:02:19.909Z"
+  }
+},
+{
+  "model": "apps.purchase",
+  "pk": "720f8d12-b391-43a3-bdf2-ffc482bea4bc",
+  "fields": {
+    "status": "CANCELLED",
+    "total_price": "45000.00",
+    "purchased_at": "2025-11-09T13:29:44.033Z"
+  }
+},
+{
+  "model": "apps.purchase",
+  "pk": "e1d0c670-df8c-415c-89dd-4386b1c11fb1",
+  "fields": {
+    "status": "COMPLETED",
+    "total_price": "45000.00",
+    "purchased_at": "2025-11-09T13:28:45.958Z"
+  }
+}
+]

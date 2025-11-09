@@ -1,0 +1,59 @@
+[
+{
+  "model": "apps.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$ocFQYlEw8e1hXaLQX1orc5$LMU1M6RDkPlPHWlNGwxgxDsQ4+Q6tVV38Q3V5p/fVpg=",
+    "last_login": "2025-11-09T13:37:30.829Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "admin",
+    "last_name": "admin",
+    "email": "admin@gamil.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-10-16T16:34:57Z",
+    "role": "admin",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "apps.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$dDRtwhiZqcFaQHmcHQ2Rfe$aOGQU2njSC2jMh52kE3l9pwzoAsA7f2xSpHFdwF68z4=",
+    "last_login": "2025-11-05T06:05:29.546Z",
+    "is_superuser": false,
+    "username": "tohir",
+    "first_name": "tohirjon",
+    "last_name": "sodiqov",
+    "email": "tohirjonsodiqov0@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-10-22T09:17:39.627Z",
+    "role": "cashier",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "apps.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$1gQ256MG1BWLwU1lUBy4mL$ykUXvVDjB3nyBuvpmZvam4M0/JBgVqPRwt8NdJG9iQ8=",
+    "last_login": "2025-11-09T13:37:44.899Z",
+    "is_superuser": false,
+    "username": "javoh",
+    "first_name": "javohir",
+    "last_name": "jo'rayev",
+    "email": "jahon1222@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-11-09T13:30:32Z",
+    "role": "cashier",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

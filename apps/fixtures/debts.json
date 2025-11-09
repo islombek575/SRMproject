@@ -1,0 +1,67 @@
+[
+{
+  "model": "apps.debt",
+  "pk": "5483141a-5310-42c5-864b-9ecea3491f46",
+  "fields": {
+    "customer": 1,
+    "amount": "30000.00",
+    "paid_amount": "30000.00",
+    "status": "paid",
+    "created_by": 1,
+    "created_at": "2025-10-28T13:16:10.746Z",
+    "updated_at": "2025-11-09T13:58:09.080Z"
+  }
+},
+{
+  "model": "apps.debt",
+  "pk": "5a395292-1ab6-443c-bb8f-ed1e22d2c96f",
+  "fields": {
+    "customer": 1,
+    "amount": "30000.00",
+    "paid_amount": "30000.00",
+    "status": "paid",
+    "created_by": 2,
+    "created_at": "2025-10-22T09:19:51.268Z",
+    "updated_at": "2025-10-22T09:22:58.705Z"
+  }
+},
+{
+  "model": "apps.debt",
+  "pk": "8c544630-2e6f-45d1-81df-fb55a849045e",
+  "fields": {
+    "customer": 1,
+    "amount": "15000.00",
+    "paid_amount": "15000.00",
+    "status": "paid",
+    "created_by": 1,
+    "created_at": "2025-10-28T13:40:22.135Z",
+    "updated_at": "2025-10-31T05:37:34.725Z"
+  }
+},
+{
+  "model": "apps.debt",
+  "pk": "9c1e7d31-9e1e-41f4-a36d-1e48ce5c6cfa",
+  "fields": {
+    "customer": 3,
+    "amount": "60000.00",
+    "paid_amount": "10000.00",
+    "status": "partial",
+    "created_by": 1,
+    "created_at": "2025-10-29T15:30:18.328Z",
+    "updated_at": "2025-10-31T05:22:38.715Z"
+  }
+},
+{
+  "model": "apps.debt",
+  "pk": "fad31c8d-8b6b-45cd-b142-c9bfcff983af",
+  "fields": {
+    "customer": 2,
+    "amount": "45000.00",
+    "paid_amount": "0.00",
+    "status": "unpaid",
+    "created_by": 1,
+    "created_at": "2025-10-28T13:58:02.792Z",
+    "updated_at": "2025-10-28T13:58:02.795Z"
+  }
+}
+]
