@@ -9,4 +9,4 @@ class Customer(Model):
     created_at = DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} — Qarz: {self.total_debt}"

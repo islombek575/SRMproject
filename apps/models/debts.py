@@ -9,21 +9,21 @@ from django.db.models import (
     DecimalField,
     ForeignKey,
     Model,
-    UUIDField,
+    UUIDField, TextChoices,
 )
 
 
 class Debt(Model):
-    STATUS_CHOICES = [
-        ('unpaid', "To'lanmagan"),
-        ('partial', "Qisman to'langan"),
-        ('paid', "To'langan"),
-    ]
+    class StatusChoices(TextChoices):
+        UNPAID =  'UNPAID', "To'lanmagan"
+        PARTIAL = 'PARTIAL', "Qisman to'langan"
+        PAID = 'PAID', "To'langan"
+
     id = UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     customer = ForeignKey(Customer, on_delete=CASCADE, related_name='debts')
     amount = DecimalField(max_digits=12, decimal_places=2)
     paid_amount = DecimalField(max_digits=12, decimal_places=2, default=0, null=True, blank=True)
-    status = CharField(max_length=10, choices=STATUS_CHOICES, default='unpaid')
+    status = CharField(max_length=10, choices=StatusChoices.choices, default=StatusChoices.UNPAID)
     created_by = ForeignKey('apps.User', on_delete=CASCADE, related_name='debt_created_by')
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
@@ -38,7 +38,7 @@ class Debt(Model):
 
     @property
     def can_pay(self):
-        return self.status in ['unpaid', 'partial']
+        return self.status in ['UNPAID', 'PARTIAL']
 
     @property
     def remaining(self):
@@ -46,9 +46,9 @@ class Debt(Model):
 
     def update_status(self):
         if self.paid_amount == 0:
-            self.status = 'unpaid'
+            self.status = self.StatusChoices.PAID
         elif self.paid_amount < self.amount:
-            self.status = 'partial'
+            self.status =self.StatusChoices.PARTIAL
         else:
-            self.status = 'paid'
+            self.status = self.StatusChoices.UNPAID
         self.save()
