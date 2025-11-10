@@ -1,7 +1,6 @@
-import uuid
 from decimal import Decimal
 
-from apps.models import Customer, Product
+from apps.models.base import UUIDBaseModel
 from django.conf import settings
 from django.db.models import (
     CASCADE,
@@ -11,21 +10,18 @@ from django.db.models import (
     DecimalField,
     ForeignKey,
     Model,
-    PositiveIntegerField,
-    UUIDField,
 )
 from django.db.models.enums import TextChoices
 
 User = settings.AUTH_USER_MODEL
 
 
-class Sale(Model):
+class Sale(UUIDBaseModel):
     class PAYMENT(TextChoices):
         CASH = 'cash', 'Naqd'
         CARD = 'card', 'Karta'
         CREDIT = 'credit', 'Nasiya'
 
-    id = UUIDField(default=uuid.uuid4, editable=False, primary_key=True, unique=True)
     customer = ForeignKey('apps.Customer', on_delete=SET_NULL, null=True, blank=True)
     cashier = ForeignKey('apps.User', on_delete=SET_NULL, null=True, blank=True)
     payment_type = CharField(max_length=10, choices=PAYMENT.choices, default=PAYMENT.CASH)
@@ -37,7 +33,6 @@ class Sale(Model):
         return f"Sale #{self.id} - Total: {self.total_amount}, Remaining: {self.total_amount - self.paid_amount}"
 
 
-
 class SaleItem(Model):
     sale = ForeignKey('apps.Sale', on_delete=CASCADE, related_name='items')
     product = ForeignKey('apps.Product', on_delete=SET_NULL, null=True)
@@ -47,7 +42,6 @@ class SaleItem(Model):
     @property
     def subtotal(self):
         return (self.quantity * self.price).quantize(Decimal("0.01"))
-
 
     def save(self, *args, **kwargs):
         if not self.pk:

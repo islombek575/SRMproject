@@ -1,7 +1,7 @@
-import uuid
 from decimal import Decimal
 
 from apps.models import Product
+from apps.models.base import UUIDBaseModel
 from django.db.models import (
     CASCADE,
     CharField,
@@ -9,19 +9,16 @@ from django.db.models import (
     DecimalField,
     ForeignKey,
     Model,
-    PositiveIntegerField,
     TextChoices,
-    UUIDField,
 )
 
 
-class Purchase(Model):
+class Purchase(UUIDBaseModel):
     class StatusChoices(TextChoices):
         PENDING = "PENDING", "Pending"
         COMPLETED = "COMPLETED", "Completed"
         CANCELLED = "CANCELLED", "Cancelled"
 
-    id = UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     status = CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.PENDING)
     total_price = DecimalField(max_digits=12, decimal_places=2)
     purchased_at = DateTimeField(auto_now_add=True)
@@ -47,5 +44,3 @@ class PurchaseItem(Model):
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity} {self.product.unit}"
-
-
