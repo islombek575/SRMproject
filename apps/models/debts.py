@@ -29,18 +29,23 @@ class Debt(CreatedBaseModel, UUIDBaseModel):
 
     @property
     def can_pay(self):
-        return self.status in ['UNPAID', 'PARTIAL']
+        return self.status != 'paid'
 
     @property
     def remaining(self):
-        paid = to_decimal(self.paid_amount)
-        return max(to_decimal(self.amount) - paid, Decimal('0.00'))
+        return max(self.amount - (self.paid_amount or Decimal(0)), Decimal(0))
 
     def update_status(self):
-        paid = to_decimal(self.paid_amount)
-        if paid == 0:
-            self.status = 'unpaid'
-        elif paid < to_decimal(self.amount):
+        if self.paid_amount >= self.amount:
+            self.status = 'paid'
+        elif 0 < self.paid_amount < self.amount:
             self.status = 'partial'
         else:
-            self.status = 'paid'
+            self.status = 'unpaid'
+        self.save(update_fields=['status'])
+
+    def make_payment(self, amount: Decimal):
+        self.paid_amount += amount
+        self.update_status()
+
+

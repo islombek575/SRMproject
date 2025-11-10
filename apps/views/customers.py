@@ -1,5 +1,5 @@
 from apps.mixins import RoleRequiredMixin
-from apps.models import Customer
+from apps.models import Customer, Debt
 from django.db.models import F, Max
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
@@ -51,6 +51,7 @@ class CustomerListView(RoleRequiredMixin, ListView):
 
 class CustomerDebtListView(RoleRequiredMixin, ListView):
     allowed_roles = ['admin']
+    model = Debt
     template_name = 'debt/customer_debt_list.html'
     context_object_name = 'debts'
 

@@ -15,7 +15,7 @@ class PurchaseListView(RoleRequiredMixin, ListView):
     model = Purchase
     template_name = 'purchases/purchase_list.html'
     context_object_name = 'purchases'
-    paginate_by = 5
+    paginate_by = 15
 
     def get_queryset(self):
         selected_date = self.request.GET.get('date')

@@ -17,11 +17,6 @@ def update_sale_total(sender, instance, **kwargs):
         post_save.connect(update_sale_total, sender=SaleItem)
 
 
-@receiver(pre_save, sender=Debt)
-def debt_pre_save(sender, instance, **kwargs):
-    instance.update_status()
-
-
 @receiver(post_delete, sender=SaleItem)
 def restore_stock_on_delete(sender, instance, **kwargs):
     try:

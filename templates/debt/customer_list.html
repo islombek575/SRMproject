@@ -6,25 +6,35 @@
         <form id="filterForm" method="GET" action="{% url 'customer_list' %}" class="mb-6">
             <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
 
-                <input type="text" id="searchInput" name="q" placeholder="Mijoz nomi qidiring..." value="{{ search_query }}"
+                <input type="text" id="searchInput" name="q" placeholder="Mijoz nomi qidiring..."
+                       value="{{ search_query }}"
                        class="flex-grow p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
 
                 <div class="flex flex-row space-x-4">
-                    <select id="debtStatusSelect" name="debt_status" class="w-1/2 md:w-auto p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select id="debtStatusSelect" name="debt_status"
+                            class="w-1/2 md:w-auto p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">Holat: Barchasi</option>
-                        <option value="has_debt" {% if debt_status == 'has_debt' %}selected{% endif %}>Qarzi borlar</option>
-                        <option value="no_debt" {% if debt_status == 'no_debt' %}selected{% endif %}>Qarzi yo'qlar</option>
+                        <option value="has_debt" {% if debt_status == 'has_debt' %}selected{% endif %}>Qarzi borlar
+                        </option>
+                        <option value="no_debt" {% if debt_status == 'no_debt' %}selected{% endif %}>Qarzi yo'qlar
+                        </option>
                     </select>
 
-                    <select id="sortSelect" name="sort_by_debt" class="w-1/2 md:w-auto p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select id="sortSelect" name="sort_by_debt"
+                            class="w-1/2 md:w-auto p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">Saralash...</option>
-                        <option value="max_debt" {% if sort_by_debt == 'max_debt' %}selected{% endif %}>Eng ko'p qarz</option>
-                        <option value="min_debt" {% if sort_by_debt == 'min_debt' %}selected{% endif %}>Eng kam qarz</option>
-                        <option value="latest_debt" {% if sort_by_debt == 'latest_debt' %}selected{% endif %}>Oxirgi qarz</option>
+                        <option value="max_debt" {% if sort_by_debt == 'max_debt' %}selected{% endif %}>Eng ko'p qarz
+                        </option>
+                        <option value="min_debt" {% if sort_by_debt == 'min_debt' %}selected{% endif %}>Eng kam qarz
+                        </option>
+                        <option value="latest_debt" {% if sort_by_debt == 'latest_debt' %}selected{% endif %}>Oxirgi
+                            qarz
+                        </option>
                     </select>
                 </div>
 
-                <button type="button" id="resetButton" class="p-3 px-6 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition md:w-auto">
+                <button type="button" id="resetButton"
+                        class="p-3 px-6 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition md:w-auto">
                     Filterni Tozalash
                 </button>
             </div>
@@ -44,7 +54,8 @@
                                     Qarz: <span class="font-bold text-red-600">{{ customer.total_debt|default:"0" }} so'm</span>
                                 </p>
                                 {% if customer.last_debt_date %}
-                                    <p class="text-xs text-gray-500">Oxirgi qarz: {{ customer.last_debt_date|date:"d M Y" }}</p>
+                                    <p class="text-xs text-gray-500">Oxirgi
+                                        qarz: {{ customer.last_debt_date|date:"d M Y" }}</p>
                                 {% endif %}
                             </div>
 
@@ -64,33 +75,33 @@
 
             <div class="mt-8">
                 {% if page_obj.has_other_pages %}
-                    <nav class="flex justify-center" aria-label="Pagination">
-                        <ul class="flex items-center space-x-2">
-                            {% if page_obj.has_previous %}
-                                <li>
-                                    <a href="?page=1&{{ request.GET.urlencode|cut:'page' }}" class="hidden sm:block px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 text-sm">Boshi</a>
-                                </li>
-                                <li>
-                                    <a href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|cut:'page' }}" class="px-3 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 text-sm">&laquo; Avvalgi</a>
-                                </li>
-                            {% endif %}
+                    <div class="flex justify-center mt-6 space-x-2 flex-wrap">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=
+                                    {{ page_obj.previous_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                               class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">← Oldingi</a>
+                        {% else %}
+                            <span class="px-3 py-2 bg-gray-100 rounded text-gray-400 cursor-not-allowed">← Oldingi</span>
+                        {% endif %}
 
-                            <li class="hidden md:block">
-                            <span class="px-4 py-2 text-gray-700 text-sm">
-                                Sahifa {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-                            </span>
-                            </li>
-
-                            {% if page_obj.has_next %}
-                                <li>
-                                    <a href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|cut:'page' }}" class="px-3 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 text-sm">Keyingi &raquo;</a>
-                                </li>
-                                <li>
-                                    <a href="?page={{ page_obj.paginator.num_pages }}&{{ request.GET.urlencode|cut:'page' }}" class="hidden sm:block px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 text-sm">Oxi</a>
-                                </li>
+                        {% for page_num in page_obj.paginator.page_range %}
+                            {% if page_num == page_obj.number %}
+                                <span class="px-3 py-2 bg-indigo-500 text-white rounded">{{ page_num }}</span>
+                            {% elif page_num > page_obj.number|add:-3 and page_num < page_obj.number|add:3 %}
+                                <a href="?page=
+                                        {{ page_num }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                                   class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{{ page_num }}</a>
                             {% endif %}
-                        </ul>
-                    </nav>
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?page=
+                                    {{ page_obj.next_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}"
+                               class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">Keyingi →</a>
+                        {% else %}
+                            <span class="px-3 py-2 bg-gray-100 rounded text-gray-400 cursor-not-allowed">Keyingi →</span>
+                        {% endif %}
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -139,7 +150,7 @@
                 window.history.pushState({}, '', url); // URL ni yangilash
 
                 // Boshqa barcha filterlar ham AJAX orqali yangilanishi uchun
-                fetch(url, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                fetch(url, {method: 'GET', headers: {'X-Requested-With': 'XMLHttpRequest'}})
                     .then(response => response.text())
                     .then(text => {
                         const parser = new DOMParser();
