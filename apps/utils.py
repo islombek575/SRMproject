@@ -1,16 +1,11 @@
-from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
+from decimal import Decimal, ROUND_HALF_UP
 
-CENTS = Decimal("0.01")
+CENTS = Decimal('0.01')
+def to_decimal(v):
+    if v is None:
+        return Decimal('0.00')
+    return (Decimal(str(v))).quantize(CENTS, rounding=ROUND_HALF_UP)
 
-def to_decimal(value, default=Decimal("0.00")):
-    if value is None:
-        return default
-    if isinstance(value, Decimal):
-        return value.quantize(CENTS, rounding=ROUND_HALF_UP)
-    try:
-        return Decimal(str(value)).quantize(CENTS, rounding=ROUND_HALF_UP)
-    except (InvalidOperation, ValueError):
-        return default
 
 def ensure_positive(value):
     d = to_decimal(value)
