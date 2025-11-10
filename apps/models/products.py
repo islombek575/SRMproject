@@ -1,7 +1,11 @@
 from decimal import Decimal
 
+from django.db import transaction
+
 from apps.models.base import CreatedBaseModel, UUIDBaseModel
 from django.db.models import CharField, DecimalField, TextChoices
+
+from apps.utils import to_decimal, CENTS
 
 
 class Product(CreatedBaseModel, UUIDBaseModel):
@@ -19,21 +23,38 @@ class Product(CreatedBaseModel, UUIDBaseModel):
     def __str__(self):
         return f"{self.name} ({self.barcode})"
 
-    @property
-    def profit(self):
-        return self.sell_price - self.cost_price
+    LOW_STOCK_THRESHOLDS = {
+        'kg': Decimal('5.00'),
+        'piece': Decimal('5'),
+    }
+
+    def get_low_stock_threshold(self):
+        return self.LOW_STOCK_THRESHOLDS.get(self.unit, Decimal('1.00'))
 
     @property
     def is_low_stock(self):
-        threshold = Decimal('1.00') if self.unit == 'kg' else Decimal('5.00')
-        return self.stock <= threshold
+        return self.stock <= self.get_low_stock_threshold()
 
     def decrease_stock(self, quantity):
-        if quantity > self.stock:
-            raise ValueError(f"Yetarli {self.get_unit_display()} yo‘q: {self.stock}")
-        self.stock -= Decimal(quantity)
-        self.save(update_fields=['stock'])
+        q = to_decimal(quantity)
+        if q <= 0:
+            raise ValueError("Quantity must be positive")
+        with transaction.atomic():
+            # reload to avoid race condition
+            prod = Product.objects.select_for_update().get(pk=self.pk)
+            if prod.stock < q:
+                raise ValueError(f"Insufficient stock: {prod.stock}")
+            prod.stock = (prod.stock - q).quantize(CENTS)
+            prod.save(update_fields=['stock'])
+            return prod.stock
 
     def increase_stock(self, quantity):
-        self.stock += Decimal(quantity)
-        self.save(update_fields=['stock'])
+        q = to_decimal(quantity)
+        if q <= 0:
+            raise ValueError("Quantity must be positive")
+        with transaction.atomic():
+            prod = Product.objects.select_for_update().get(pk=self.pk)
+            prod.stock = (prod.stock + q).quantize(CENTS)
+            prod.save(update_fields=['stock'])
+            return prod.stock
+

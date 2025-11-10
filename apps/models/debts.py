@@ -4,6 +4,8 @@ from apps.models.base import CreatedBaseModel, UUIDBaseModel
 from apps.models.customers import Customer
 from django.db.models import CASCADE, CharField, DecimalField, ForeignKey, TextChoices
 
+from apps.utils import to_decimal
+
 
 class Debt(CreatedBaseModel, UUIDBaseModel):
     class StatusChoices(TextChoices):
@@ -31,13 +33,14 @@ class Debt(CreatedBaseModel, UUIDBaseModel):
 
     @property
     def remaining(self):
-        return self.amount - self.paid_amount or Decimal(0.00)
+        paid = to_decimal(self.paid_amount)
+        return max(to_decimal(self.amount) - paid, Decimal('0.00'))
 
     def update_status(self):
-        if self.paid_amount == 0:
-            self.status = self.StatusChoices.PAID
-        elif self.paid_amount < self.amount:
-            self.status = self.StatusChoices.PARTIAL
+        paid = to_decimal(self.paid_amount)
+        if paid == 0:
+            self.status = 'unpaid'
+        elif paid < to_decimal(self.amount):
+            self.status = 'partial'
         else:
-            self.status = self.StatusChoices.UNPAID
-        self.save()
+            self.status = 'paid'

@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from django.db import transaction
+
 from apps.models.base import UUIDBaseModel
 from django.conf import settings
 from django.db.models import (
@@ -12,6 +14,8 @@ from django.db.models import (
     Model,
 )
 from django.db.models.enums import TextChoices
+
+from apps.utils import to_decimal
 
 User = settings.AUTH_USER_MODEL
 
@@ -29,8 +33,23 @@ class Sale(UUIDBaseModel):
     paid_amount = DecimalField(max_digits=12, decimal_places=2, default=0)
     created_at = DateTimeField(auto_now_add=True)
 
+    def recalc_total(self):
+        total = sum((item.subtotal for item in self.items.all()), Decimal('0.00'))
+        self.total_amount = to_decimal(total)
+        return self.total_amount
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.recalc_total()
+        super().save(update_fields=['total_amount'])
+        # update customer debt only for credit sales
+        if self.payment_type == Sale.PAYMENT.CREDIT and self.customer:
+            self.customer.total_debt = to_decimal(self.customer.total_debt) + (self.total_amount - to_decimal(self.paid_amount))
+            self.customer.save(update_fields=['total_debt'])
+
+
     def __str__(self):
-        return f"Sale #{self.id} - Total: {self.total_amount}, Remaining: {self.total_amount - self.paid_amount}"
+            return f"Sale #{self.id} - Total: {self.total_amount}, Remaining: {self.total_amount - self.paid_amount}"
 
 
 class SaleItem(Model):
@@ -41,9 +60,14 @@ class SaleItem(Model):
 
     @property
     def subtotal(self):
-        return (self.quantity * self.price).quantize(Decimal("0.01"))
+        return to_decimal(self.quantity) * to_decimal(self.price)
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.product.decrease_stock(self.quantity)
-        super().save(*args, **kwargs)
+        is_new = self.pk is None
+
+        with transaction.atomic():
+            if is_new:
+                self.product.decrease_stock(self.quantity)
+            super().save(*args, **kwargs)
+            self.sale.recalc_total()
+            self.sale.save(update_fields=['total_amount'])

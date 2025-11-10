@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from django.db import transaction
+
 from apps.models import Product
 from apps.models.base import UUIDBaseModel
 from django.db.models import (
@@ -11,6 +13,8 @@ from django.db.models import (
     Model,
     TextChoices,
 )
+
+from apps.utils import to_decimal
 
 
 class Purchase(UUIDBaseModel):
@@ -26,6 +30,16 @@ class Purchase(UUIDBaseModel):
     def __str__(self):
         return f"Purchase #{self.id}"
 
+    def recalc_total(self):
+        total = sum((item.total_price for item in self.items.all()), Decimal('0.00'))
+        self.total_price = to_decimal(total)
+        return self.total_price
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.recalc_total()
+        super().save(update_fields=['total_price'])
+
 
 class PurchaseItem(Model):
     purchase = ForeignKey(Purchase, on_delete=CASCADE, related_name="items")
@@ -35,12 +49,18 @@ class PurchaseItem(Model):
 
     @property
     def total_price(self):
-        return (self.quantity * self.cost_price).quantize(Decimal("0.01"))
+        return to_decimal(self.quantity) * to_decimal(self.cost_price)
+
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.product.increase_stock(self.quantity)
-        super().save(*args, **kwargs)
+        is_new = self.pk is None
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            self.purchase.recalc_total()
+            self.purchase.save(update_fields=['total_price'])
+            if is_new:
+                self.product.increase_stock(self.quantity)
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity} {self.product.unit}"
+
